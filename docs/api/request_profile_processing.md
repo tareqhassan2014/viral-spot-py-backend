@@ -20,6 +20,14 @@ The endpoint includes logic to prevent duplicate processing. If a profile has al
 | :-------- | :----- | :------------------------------------ | :--------- |
 | `source`  | string | The source of the processing request. | `frontend` |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a POST request with a `username` path parameter and an optional `source` query parameter.
+2.  **Check if Already Processed**: It first queries the `primary_profiles` table to see if the profile already exists and has been fully processed. If so, it returns a message indicating that the profile is already complete.
+3.  **Check if Already in Queue**: If the profile is not in `primary_profiles`, it then checks the `queue` table to see if there is already a pending or processing job for that `username`. If so, it returns a message indicating it's already in the queue.
+4.  **Add to Queue**: If the profile is not in either table, it creates a new entry in the `queue` table with the `username`, `source`, and a `HIGH` priority.
+5.  **Send Response**: It returns a success message indicating that the profile has been added to the queue, along with an estimated processing time.
+
 ## Responses
 
 ### Success: 200 OK

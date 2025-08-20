@@ -12,6 +12,14 @@ This endpoint fetches the profile information for a given username from the data
 | :--------- | :----- | :--------------------------------- |
 | `username` | string | The Instagram username to look up. |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives an HTTP GET request with a `username` in the URL path.
+2.  **Query Database**: It queries the `primary_profiles` table to find a record where the `username` column matches the one from the request.
+3.  **Handle Not Found**: If no record is found, the endpoint returns a `404 Not Found` error.
+4.  **Transform Data**: If a profile is found, the raw data from the database is passed to a transformation function (`_transform_profile_for_frontend`). This function formats the data into a frontend-friendly structure, which might involve renaming fields, calculating new values, or nesting related data.
+5.  **Send Response**: The transformed profile data is returned in the response with a `200 OK` status.
+
 ## Responses
 
 ### Success: 200 OK

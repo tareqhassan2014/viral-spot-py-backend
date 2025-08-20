@@ -20,6 +20,18 @@ The response includes:
 | :--------- | :----- | :------------------------------------------------ |
 | `queue_id` | string | The ID of the completed analysis job to retrieve. |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request with a `queue_id` in the URL path.
+2.  **Verify Job Completion**: It first queries the `viral_ideas_queue` table to ensure that the job with the given `queue_id` has a status of `completed`. If not, it returns a `404 Not Found` error.
+3.  **Fetch Analysis Results**: It then queries multiple tables to assemble the final response:
+    -   `viral_analysis_results`: To get the main analysis data.
+    -   `primary_profiles`: To get the data for the primary user.
+    -   `viral_ideas_competitors`: To get the list of competitor usernames.
+    -   `viral_analysis_reels`: To get the list of reels that were part of the analysis.
+4.  **Combine and Transform**: The data from these various tables is combined and transformed into a single, comprehensive JSON object.
+5.  **Send Response**: The final JSON object is returned with a `200 OK` status.
+
 ## Responses
 
 ### Success: 200 OK

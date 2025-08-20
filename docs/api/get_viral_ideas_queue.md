@@ -14,6 +14,13 @@ The endpoint returns a comprehensive status object, including the current stage 
 | :----------- | :----- | :--------------------------------------------------------------------------------- |
 | `session_id` | string | The unique identifier for the user's session, which is linked to the analysis job. |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request with a `session_id` in the URL path.
+2.  **Query Database View**: It queries a database view called `viral_queue_summary`. This view is a pre-joined and aggregated representation of the `viral_ideas_queue` and `viral_ideas_competitors` tables, designed for efficient status lookups.
+3.  **Handle Not Found**: If no record is found for the given `session_id`, a `404 Not Found` error is returned.
+4.  **Send Response**: If a record is found, the data from the view is returned as the response with a `200 OK` status.
+
 ## Responses
 
 ### Success: 200 OK

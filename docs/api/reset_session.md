@@ -14,6 +14,13 @@ Calling this endpoint will clear the stored random seed for a given `session_id`
 | :----------- | :----- | :------------------------------ |
 | `session_id` | string | The ID of the session to reset. |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a POST request with a `session_id` as a query parameter.
+2.  **Access In-Memory Storage**: It accesses an in-memory dictionary or hash map (`session_storage`) that stores the random seeds for user sessions.
+3.  **Delete Session Data**: If an entry exists for the given `session_id`, it is deleted from the in-memory storage.
+4.  **Send Response**: It returns a confirmation message, indicating whether the session was found and reset or not found.
+
 ## Responses
 
 ### Success: 200 OK

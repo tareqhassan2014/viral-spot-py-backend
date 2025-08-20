@@ -43,6 +43,13 @@ The filtering and sorting options for this endpoint are a subset of those availa
 | `random_order` | boolean | If `true`, returns the results in a random order for the given `session_id`.    | `false` |
 | `session_id`   | string  | A unique ID for the user's session, used for consistent random ordering.        | `null`  |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request with various optional query parameters.
+2.  **Set Content Type Filter**: It internally sets a filter to only include content where `content_type` is `'post'`.
+3.  **Call Reels Logic**: Instead of duplicating code, it calls the same underlying function that the `/api/reels` endpoint uses, passing along all the query parameters and the hardcoded `content_type` filter.
+4.  **Execute and Respond**: The reels logic then handles the query building, execution, transformation, and response, just as it would for reels, but only returning posts.
+
 ## Responses
 
 ### Success: 200 OK

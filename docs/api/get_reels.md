@@ -54,6 +54,17 @@ This endpoint accepts a wide range of query parameters to customize the results.
 | `random_order` | boolean | If `true`, returns the results in a random order for the given `session_id`.                                                                      | `false` |
 | `session_id`   | string  | A unique ID for the user's session, used for consistent random ordering.                                                                          | `null`  |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request with a wide range of optional query parameters for filtering, sorting, and pagination.
+2.  **Parse and Validate Filters**: The query parameters are parsed and validated, often using a Pydantic-like model (`ReelFilter`) to ensure data integrity.
+3.  **Build Dynamic Query**: A flexible database query is constructed on the `content` table. Each filter parameter adds a `WHERE` clause to the query. This includes filtering by categories, keywords, performance metrics (views, likes), and account metrics (followers).
+4.  **Apply Sorting**: The `sort_by` parameter determines the `ORDER BY` clause. If `random_order` is `true`, it uses a `session_id` to create a consistent random sort for that user's session.
+5.  **Apply Pagination**: The `limit` and `offset` parameters are used to paginate the results.
+6.  **Execute Query**: The complex, dynamically built query is executed against the database.
+7.  **Transform Data**: The results are transformed into a frontend-friendly format.
+8.  **Send Response**: The paginated and transformed list of reels is returned with a `200 OK` status.
+
 ## Responses
 
 ### Success: 200 OK

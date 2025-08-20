@@ -20,6 +20,20 @@ This endpoint retrieves a list of reels for a given `username`. It is used to po
 | `limit`   | integer | The maximum number of reels to return per page. Must be between 1 and 100. | `24`      |
 | `offset`  | integer | The number of reels to skip for pagination.                                | `0`       |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request with a `username` path parameter and optional query parameters (`sort_by`, `limit`, `offset`).
+2.  **Build Query**: It constructs a database query on the `content` table, filtering for records that match the `username`.
+3.  **Apply Sorting**: Based on the `sort_by` parameter, it adds an `ORDER BY` clause to the query:
+    -   `popular`: Orders by `outlier_score` and `view_count` descending.
+    -   `recent`: Orders by `date_posted` descending.
+    -   `oldest`: Orders by `date_posted` ascending.
+4.  **Apply Pagination**: It uses the `limit` and `offset` parameters to paginate the results.
+5.  **Execute Query**: The query is executed to fetch the reels from the database.
+6.  **Transform Data**: Each reel in the result is transformed into a frontend-friendly format.
+7.  **Check for More Pages**: The system checks if there are more reels available beyond the current page to set the `isLastPage` flag.
+8.  **Send Response**: It returns the list of transformed reels and the `isLastPage` flag with a `200 OK` status.
+
 ## Responses
 
 ### Success: 200 OK

@@ -16,6 +16,13 @@ It calls the internal `_fetch_basic_profile_data` method, which is responsible f
 | :--------- | :----- | :----------------------------------- |
 | `username` | string | The username of the profile to test. |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request with a `username` in the URL path.
+2.  **Call Internal Method**: It directly calls an internal, private method (`_fetch_basic_profile_data`) from a helper module. This method is likely responsible for fetching raw data from an external API.
+3.  **Bypass Transformations**: This endpoint intentionally bypasses the standard data transformation and validation layers of the main application.
+4.  **Send Raw Response**: It returns the raw, untransformed data directly from the internal method, which is useful for debugging the underlying data source.
+
 ## Responses
 
 ### Success: 200 OK

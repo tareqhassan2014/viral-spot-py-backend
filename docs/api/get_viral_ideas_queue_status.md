@@ -11,6 +11,13 @@ The endpoint returns two main pieces of information:
 1.  **Statistics:** A count of jobs in each status category (pending, processing, completed, failed).
 2.  **Recent Items:** A list of the 10 most recently submitted jobs, providing a snapshot of the latest activity.
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request.
+2.  **Get Statistics**: It performs several `COUNT` queries on the `viral_ideas_queue` table to get the number of jobs in each status category (pending, processing, completed, failed).
+3.  **Get Recent Items**: It queries the `viral_queue_summary` view, ordering by the submission date descending and limiting the result to 10 to get the most recent jobs.
+4.  **Combine and Respond**: The statistics and the list of recent items are combined into a single JSON object and returned with a `200 OK` status.
+
 ## Responses
 
 ### Success: 200 OK

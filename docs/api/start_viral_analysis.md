@@ -14,6 +14,14 @@ It's important to note that this endpoint does not immediately change the status
 | :--------- | :----- | :----------------------------------- |
 | `queue_id` | string | The ID of the analysis job to start. |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a POST request with a `queue_id` in the URL path.
+2.  **Verify Job Status**: It queries the `viral_ideas_queue` table to find the job with the given `queue_id`. It verifies that the job exists and its status is `pending`.
+3.  **Handle Invalid State**: If the job is not found or is not in a `pending` state, it returns an appropriate error (e.g., `404 Not Found` or `409 Conflict`).
+4.  **Signal for Processing**: This endpoint does not directly start the processing. Instead, it acts as a signal to the backend worker processes that the job is ready to be picked up. The worker is responsible for changing the status to `processing`.
+5.  **Send Response**: It returns a confirmation message that the job has been queued and will be processed shortly.
+
 ## Responses
 
 ### Success: 200 OK

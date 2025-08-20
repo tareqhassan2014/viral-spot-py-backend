@@ -22,6 +22,15 @@ The endpoint supports pagination and several sorting options to help users analy
 | `offset`  | integer | The number of content items to skip for pagination.                | `0`       |
 | `sort_by` | string  | The sorting order. Options: `popular`, `recent`, `views`, `likes`. | `popular` |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request with a `username` path parameter and optional query parameters for sorting and pagination.
+2.  **Build Query**: It constructs a database query on the `content` table, filtering for records that match the `username`.
+3.  **Apply Sorting**: The `sort_by` parameter is used to add an `ORDER BY` clause to the query.
+4.  **Apply Pagination**: The `limit` and `offset` parameters are used for pagination.
+5.  **Execute Query**: The query is executed to fetch the competitor's content.
+6.  **Transform and Respond**: The results are transformed into a frontend-friendly format and returned with a `200 OK` status.
+
 ## Responses
 
 ### Success: 200 OK

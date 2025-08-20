@@ -8,6 +8,13 @@ This endpoint serves as a batch operation to process all viral ideas analysis jo
 
 This is likely used for administrative purposes or scheduled tasks to keep the analysis pipeline flowing smoothly.
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a POST request.
+2.  **Instantiate Queue Manager**: It creates an instance of a `ViralIdeasQueueManager` class.
+3.  **Start Background Task**: It calls a method on the queue manager (e.g., `process_all_pending`) which is designed to run as a background task. This method fetches all pending jobs from the `viral_ideas_queue` table and processes them.
+4.  **Send Response**: The endpoint immediately returns a confirmation that the batch processing has started in the background.
+
 ## Responses
 
 ### Success: 200 OK

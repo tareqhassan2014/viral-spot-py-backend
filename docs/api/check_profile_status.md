@@ -12,6 +12,15 @@ After a new profile is requested for analysis via the `POST /api/profile/{userna
 | :--------- | :----- | :------------------------------------ |
 | `username` | string | The username of the profile to check. |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request with a `username` in the URL path.
+2.  **Check `primary_profiles` Table**: It first queries the `primary_profiles` table to see if a record with the given `username` exists.
+3.  **Return Completed Status**: If a record is found in `primary_profiles`, it means the processing is complete. The endpoint returns a response with `completed: true`.
+4.  **Check `queue` Table**: If the profile is not in `primary_profiles`, it then queries the `queue` table to find the status of the job for that `username`.
+5.  **Return Queue Status**: If a record is found in the `queue`, it returns a response with `completed: false` and the current `status` from the queue (e.g., `PENDING`, `PROCESSING`).
+6.  **Return Not Found**: If the profile is not found in either table, it returns a response with `completed: false` and a `status` of `NOT_FOUND`.
+
 ## Responses
 
 ### Success: 200 OK

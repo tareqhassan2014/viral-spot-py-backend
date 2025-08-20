@@ -32,6 +32,14 @@ The endpoint expects a JSON request body with the following structure:
 | `content_strategy`     | object           | An object describing the user's content strategy.       |
 | `selected_competitors` | array of strings | A list of usernames for the competitors to be analyzed. |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a POST request with a JSON body containing the `session_id`, `primary_username`, `content_strategy`, and `selected_competitors`.
+2.  **Validate Request Body**: The incoming JSON is validated against a predefined schema (e.g., a Pydantic model or a Nest.js DTO) to ensure all required fields are present and have the correct types.
+3.  **Create Queue Entry**: A new record is created in the `viral_ideas_queue` table with the data from the request. The status is set to `pending`.
+4.  **Link Competitors**: For each username in the `selected_competitors` array, a new record is created in the `viral_ideas_competitors` table, linking them to the new queue entry.
+5.  **Send Response**: The endpoint returns a success message along with the ID of the newly created queue entry.
+
 ## Responses
 
 ### Success: 200 OK

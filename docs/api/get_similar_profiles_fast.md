@@ -19,6 +19,16 @@ This endpoint is an optimized alternative to the standard `/similar` endpoint. I
 | `limit`         | integer | The number of similar profiles to return (between 1 and 80).       | `20`    |
 | `force_refresh` | boolean | If `true`, bypasses the cache and fetches fresh data from the API. | `false` |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request with a `username` path parameter and optional `limit` and `force_refresh` query parameters.
+2.  **Check Cache**: It first checks an in-memory cache (or a dedicated caching service like Redis) for the requested `username` and `limit`. If `force_refresh` is `true`, this step is skipped.
+3.  **Return Cached Data**: If a valid, non-expired cache entry is found, the data is returned directly with a message indicating it was cached.
+4.  **Query Database**: If the data is not in the cache or `force_refresh` is true, it queries the `similar_profiles` table. It filters for records matching the `primary_username` and limits the results.
+5.  **Fetch from External API (if needed)**: If the `similar_profiles` table is empty or the data is stale, the system may call an external API to fetch a new list of similar profiles.
+6.  **Update Database and Cache**: The new data is used to update the `similar_profiles` table and is stored in the cache with a 24-hour expiration.
+7.  **Transform and Respond**: The data is formatted for the frontend and returned with a `200 OK` status.
+
 ## Responses
 
 ### Success: 200 OK

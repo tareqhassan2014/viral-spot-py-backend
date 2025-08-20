@@ -15,6 +15,15 @@ This is a key part of building a list of competitors for a user to track and ana
 | `primary_username` | string | The username of the user who is adding a competitor. |
 | `target_username`  | string | The username of the profile to add as a competitor.  |
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a POST request with `primary_username` and `target_username` in the URL path.
+2.  **Fetch Competitor Data**: It calls a helper module (`simple_similar_profiles_api`) to fetch the basic profile data for the `target_username` from an external API.
+3.  **Handle Not Found**: If the `target_username` cannot be found by the external API, a `404 Not Found` error is returned.
+4.  **Download Profile Image**: The system downloads the profile image of the `target_username` and stores it in a local storage bucket (e.g., Supabase Storage).
+5.  **Add to Database**: It creates a new record in the `similar_profiles` table with the `primary_username`, `target_username`, and the path to the downloaded profile image.
+6.  **Transform and Respond**: The data for the newly added competitor is formatted for the frontend and returned with a `200 OK` status.
+
 ## Responses
 
 ### Success: 200 OK

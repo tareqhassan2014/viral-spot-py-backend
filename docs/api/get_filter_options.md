@@ -8,6 +8,13 @@ This is a utility endpoint designed to populate the filter dropdowns and selecti
 
 By using this endpoint, the frontend can ensure that its filter options are always in sync with the data that actually exists in the database, providing a better user experience.
 
+## Execution Flow
+
+1.  **Receive Request**: The endpoint receives a GET request.
+2.  **Query for Distinct Values**: It executes several `SELECT DISTINCT` queries on the `content` and `primary_profiles` tables to get all the unique values for each filterable field (e.g., `primary_category`, `language`, `account_type`).
+3.  **Assemble Response**: The results of these queries are assembled into a single JSON object, where each key is a filter type and the value is a sorted list of the unique options.
+4.  **Send Response**: The JSON object with all the filter options is returned with a `200 OK` status.
+
 ## Responses
 
 ### Success: 200 OK
