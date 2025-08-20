@@ -40,10 +40,10 @@ This document outlines the REST API endpoints available in the ViralSpot backend
     -   **Description:** A new, faster endpoint for retrieving similar profiles with 24hr caching.
     -   **Usage:** An optimized alternative to the standard `/similar` endpoint with CDN-delivered images.
 
-5.  **DELETE `/api/profile/{username}/similar-cache` ⚡ NEW**
+5.  **DELETE `/api/profile/{username}/similar-cache` ⚡ NEW** ([Details](./api/clear_similar_profiles_cache.md))
 
-    -   **Description:** Clears cached similar profiles data for a specific username.
-    -   **Usage:** Cache management and data refresh for similar profiles optimization.
+    -   **Description:** Clears cached similar profiles data for a specific username with advanced cache management.
+    -   **Usage:** Cache management, data refresh, and performance optimization for similar profiles system.
 
 6.  **GET `/api/profile/{username}/secondary`** ([Details](./api/get_secondary_profile.md))
 
@@ -98,10 +98,10 @@ This document outlines the REST API endpoints available in the ViralSpot backend
     -   **Description:** Retrieves the status of a specific viral ideas analysis job from the queue.
     -   **Usage:** Polling for real-time updates on the analysis progress.
 
-3.  **GET `/api/viral-ideas/check-existing/{username}` ⚡ NEW**
+3.  **GET `/api/viral-ideas/check-existing/{username}` ⚡ NEW** ([Details](./api/check_existing_viral_analysis.md))
 
-    -   **Description:** Checks if there's already an existing analysis (completed or active) for a profile.
-    -   **Usage:** Prevents duplicate analysis creation and enables loading existing results.
+    -   **Description:** Checks if there's already an existing analysis (completed or active) for a profile with intelligent duplicate prevention.
+    -   **Usage:** Prevents duplicate analysis creation, enables immediate access to existing results, and optimizes resource utilization.
 
 4.  **POST `/api/viral-ideas/queue/{queue_id}/start` ⚡ NEW** ([Details](./api/start_viral_analysis.md))
 
