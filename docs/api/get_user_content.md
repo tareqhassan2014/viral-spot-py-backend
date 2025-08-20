@@ -31,6 +31,65 @@ The endpoint supports pagination and sorting to make it easy for users to browse
 5.  **Execute Query**: The query is executed to fetch the user's content.
 6.  **Transform and Respond**: The results are transformed into a frontend-friendly format and returned with a `200 OK` status.
 
+## Detailed Implementation Guide
+
+### Python (FastAPI)
+
+```python
+# In backend_api.py
+
+@app.get("/api/content/user/{username}")
+async def get_user_content(
+    username: str,
+    limit: int = Query(24, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    sort_by: str = Query("recent", ...),
+    api_instance: ViralSpotAPI = Depends(get_api)
+):
+    """Get user's own content for grid display"""
+    # The implementation is identical to `get_competitor_content`
+    # It queries the `content` table filtered by the `username`.
+    try:
+        query = api_instance.supabase.client.table('content').select(
+            '*, primary_profiles!profile_id (*)'
+        ).eq('username', username)
+
+        # ... apply sorting ...
+
+        result = query.range(offset, offset + limit - 1).execute()
+        # ... transform results ...
+        return APIResponse(success=True, data={...})
+
+    except Exception as e:
+        # ... error handling ...
+```
+
+**Line-by-Line Explanation:**
+
+This endpoint's code is functionally identical to `get_competitor_content`. It queries the `content` table, filters by the `username` provided in the path, and applies sorting and pagination. The only difference is the default `sort_by` value.
+
+### Nest.js (Mongoose)
+
+```typescript
+// In your content.controller.ts
+
+@Get('/user/:username')
+async getUserContent(
+  @Param('username') username: string,
+  @Query('limit') limit: number = 24,
+  @Query('offset') offset: number = 0,
+  @Query('sort_by') sortBy: string = 'recent',
+) {
+  // You can reuse the same service method as getCompetitorContent
+  const result = await this.contentService.getCompetitorContent(username, limit, offset, sortBy);
+  return { success: true, data: result };
+}
+
+// In your content.service.ts
+// No new method is needed. The `getCompetitorContent` method can be reused
+// as it already fetches content by username.
+```
+
 ## Responses
 
 ### Success: 200 OK

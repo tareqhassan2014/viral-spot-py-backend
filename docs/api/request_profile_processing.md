@@ -28,6 +28,92 @@ The endpoint includes logic to prevent duplicate processing. If a profile has al
 4.  **Add to Queue**: If the profile is not in either table, it creates a new entry in the `queue` table with the `username`, `source`, and a `HIGH` priority.
 5.  **Send Response**: It returns a success message indicating that the profile has been added to the queue, along with an estimated processing time.
 
+## Detailed Implementation Guide
+
+### Python (FastAPI)
+
+```python
+# In ViralSpotAPI class in backend_api.py
+
+async def request_profile_processing(self, username: str, source: str = "frontend"):
+    """Request high priority processing for a profile"""
+    try:
+        primary_response = self.supabase.client.table('primary_profiles').select('username').eq('username', username).execute()
+        if primary_response.data:
+            return { 'queued': False, 'message': f'Profile {username} is already fully processed', ... }
+
+        queue_response = self.supabase.client.table('queue').select('*').eq('username', username).in_('status', ['PENDING', 'PROCESSING']).execute()
+        if queue_response.data:
+            return { 'queued': True, 'message': f'Profile {username} is already in queue', ... }
+
+        queue_data = { 'username': username, 'source': source, 'priority': 'HIGH', ... }
+        await self.supabase.save_queue_item(queue_data)
+        return { 'queued': True, 'message': f'Profile {username} added to high priority queue', ... }
+
+    except Exception as e:
+        # ... error handling ...
+
+# FastAPI endpoint definition
+@app.post("/api/profile/{username}/request")
+async def request_profile_processing(...):
+    result = await api_instance.request_profile_processing(username, source)
+    return APIResponse(success=True, data=result)
+```
+
+**Line-by-Line Explanation:**
+
+1.  **`primary_response = ...`**: Checks if the profile already exists in `primary_profiles`. If so, it returns a message and does not queue.
+2.  **`queue_response = ...`**: Checks if the profile is already in the `queue` with a pending or processing status.
+3.  **`queue_data = { ... }`**: If the profile is not found in either table, it creates a new dictionary for the queue record.
+4.  **`await self.supabase.save_queue_item(queue_data)`**: Saves the new record to the `queue` table.
+
+### Nest.js (Mongoose)
+
+```typescript
+// In your profile.controller.ts
+
+@Post(':username/request')
+async requestProfileProcessing(
+  @Param('username') username: string,
+  @Query('source') source: string = 'frontend',
+) {
+  const result = await this.profileService.requestProfileProcessing(username, source);
+  return { success: true, data: result };
+}
+
+// In your profile.service.ts
+
+async requestProfileProcessing(username: string, source: string): Promise<any> {
+  const existingProfile = await this.primaryProfileModel.findOne({ username }).exec();
+  if (existingProfile) {
+    return { queued: false, message: 'Profile is already fully processed' };
+  }
+
+  const existingQueueItem = await this.queueModel.findOne({
+    username,
+    status: { $in: ['PENDING', 'PROCESSING'] },
+  }).exec();
+  if (existingQueueItem) {
+    return { queued: false, message: 'Profile is already in the queue' };
+  }
+
+  const newQueueItem = new this.queueModel({
+    username,
+    source,
+    priority: 'HIGH',
+    status: 'PENDING',
+    attempts: 0,
+  });
+  await newQueueItem.save();
+
+  return {
+    queued: true,
+    message: 'Profile has been added to the high priority queue',
+    estimated_time: '1-3 minutes',
+  };
+}
+```
+
 ## Responses
 
 ### Success: 200 OK

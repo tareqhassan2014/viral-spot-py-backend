@@ -28,6 +28,104 @@ This endpoint is used to suggest other profiles that a user might be interested 
 6.  **Transform Data**: The data for each similar profile is formatted for the frontend.
 7.  **Send Response**: It returns the list of transformed similar profiles with a `200 OK` status.
 
+## Detailed Implementation Guide
+
+### Python (FastAPI)
+
+```python
+# In ViralSpotAPI class in backend_api.py
+
+async def get_similar_profiles(self, username: str, limit: int = 20):
+    """Get similar profiles for a username"""
+    try:
+        logger.info(f"Getting similar profiles for: {username}")
+
+        primary_response = self.supabase.client.table('primary_profiles').select('id').eq('username', username).execute()
+
+        if not primary_response.data:
+            raise HTTPException(status_code=404, detail="Profile not found")
+
+        primary_id = primary_response.data[0]['id']
+
+        similar_response = self.supabase.client.table('secondary_profiles').select(
+            'username, full_name, followers_count, profile_pic_url, profile_pic_path, similarity_rank'
+        ).eq('discovered_by_id', primary_id).order('similarity_rank').limit(limit).execute()
+
+        similar_profiles = []
+        for profile in similar_response.data:
+            # ... transformation logic for each similar profile ...
+            similar_profiles.append({ ... })
+
+        # ... logic to build the final response object ...
+
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error getting similar profiles for {username}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# FastAPI endpoint definition
+@app.get("/api/profile/{username}/similar")
+async def get_similar_profiles(
+    username: str = Path(..., description="Instagram username"),
+    limit: int = Query(20, ge=1, le=100),
+    api_instance: ViralSpotAPI = Depends(get_api)
+):
+    """Get similar profiles for a username"""
+    result = await api_instance.get_similar_profiles(username, limit)
+    return result
+```
+
+**Line-by-Line Explanation:**
+
+1.  **`primary_response = ...`**: Finds the primary profile to get its `id`.
+2.  **`similar_response = ...`**: Queries the `secondary_profiles` table for all profiles that were `discovered_by_id` of the primary profile.
+3.  **`.order('similarity_rank').limit(limit)`**: Sorts the results by rank and limits them.
+4.  **`for profile in similar_response.data:`**: Loops through the results to transform each one.
+
+### Nest.js (Mongoose)
+
+```typescript
+// In your profile.controller.ts
+
+@Get(':username/similar')
+async getSimilarProfiles(
+  @Param('username') username: string,
+  @Query('limit') limit: number = 20,
+) {
+  const result = await this.profileService.getSimilarProfiles(username, limit);
+  if (!result) {
+    throw new NotFoundException('Primary profile not found');
+  }
+  return { success: true, data: result };
+}
+
+// In your profile.service.ts
+
+async getSimilarProfiles(username: string, limit: number): Promise<any> {
+  const primaryProfile = await this.primaryProfileModel.findOne({ username }).exec();
+  if (!primaryProfile) {
+    return null;
+  }
+
+  const similarProfiles = await this.secondaryProfileModel
+    .find({ discovered_by_id: primaryProfile._id })
+    .sort({ similarity_rank: 1 })
+    .limit(limit)
+    .exec();
+
+  // You would have a transformation method for secondary profiles
+  const transformedProfiles = similarProfiles.map(p => this.transformSecondaryProfile(p));
+
+  return {
+      similar_profiles: transformedProfiles,
+      // ... other data for the response
+  };
+}
+```
+
 ## Responses
 
 ### Success: 200 OK

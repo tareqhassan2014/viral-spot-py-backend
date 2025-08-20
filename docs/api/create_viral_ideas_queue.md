@@ -40,6 +40,87 @@ The endpoint expects a JSON request body with the following structure:
 4.  **Link Competitors**: For each username in the `selected_competitors` array, a new record is created in the `viral_ideas_competitors` table, linking them to the new queue entry.
 5.  **Send Response**: The endpoint returns a success message along with the ID of the newly created queue entry.
 
+## Detailed Implementation Guide
+
+### Python (FastAPI)
+
+```python
+# In backend_api.py
+
+@app.post("/api/viral-ideas/queue")
+async def create_viral_ideas_queue(request: ViralIdeasQueueRequest, api_instance: ViralSpotAPI = Depends(get_api)):
+    """Create a new viral ideas analysis queue entry"""
+    try:
+        content_strategy_json = request.content_strategy.dict()
+
+        queue_result = api_instance.supabase.client.table('viral_ideas_queue').insert({
+            'session_id': request.session_id,
+            'primary_username': request.primary_username,
+            'content_strategy': content_strategy_json,
+            'status': 'pending',
+        }).execute()
+
+        queue_id = queue_result.data[0]['id']
+
+        if request.selected_competitors:
+            competitor_records = [{'queue_id': queue_id, 'competitor_username': c} for c in request.selected_competitors]
+            api_instance.supabase.client.table('viral_ideas_competitors').insert(competitor_records).execute()
+
+        # ... construct and return response ...
+
+    except Exception as e:
+        # ... error handling ...
+```
+
+**Line-by-Line Explanation:**
+
+1.  **`request: ViralIdeasQueueRequest`**: The endpoint uses a Pydantic model `ViralIdeasQueueRequest` to automatically validate the incoming JSON body.
+2.  **`api_instance.supabase.client.table('viral_ideas_queue').insert(...)`**: Inserts a new row into the `viral_ideas_queue` table with the main analysis job details.
+3.  **`queue_id = queue_result.data[0]['id']`**: Retrieves the ID of the newly created queue entry.
+4.  **`competitor_records = [...]`**: Creates a list of dictionary objects, one for each selected competitor.
+5.  **`api_instance.supabase.client.table('viral_ideas_competitors').insert(...)`**: Performs a bulk insert into the `viral_ideas_competitors` table to link the competitors to the main job.
+
+### Nest.js (Mongoose)
+
+```typescript
+// In your viral-ideas.controller.ts
+import { CreateViralIdeasDto } from './dto/create-viral-ideas.dto';
+
+@Post('/queue')
+async createViralIdeasQueue(@Body() createDto: CreateViralIdeasDto) {
+  const result = await this.viralIdeasService.createQueue(createDto);
+  return { success: true, data: result };
+}
+
+// In your viral-ideas.service.ts
+async createQueue(createDto: CreateViralIdeasDto): Promise<any> {
+  // Create the main queue entry
+  const newQueueItem = new this.viralIdeasQueueModel({
+    session_id: createDto.session_id,
+    primary_username: createDto.primary_username,
+    content_strategy: createDto.content_strategy,
+    status: 'pending',
+  });
+  const savedQueueItem = await newQueueItem.save();
+
+  // Create the competitor links
+  if (createDto.selected_competitors && createDto.selected_competitors.length > 0) {
+    const competitorDocs = createDto.selected_competitors.map(username => ({
+      queue_id: savedQueueItem._id,
+      competitor_username: username,
+    }));
+    await this.viralIdeasCompetitorModel.insertMany(competitorDocs);
+  }
+
+  // Return the created queue item's data
+  return {
+    id: savedQueueItem._id,
+    session_id: savedQueueItem.session_id,
+    // ... other fields
+  };
+}
+```
+
 ## Responses
 
 ### Success: 200 OK

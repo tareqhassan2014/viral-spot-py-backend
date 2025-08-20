@@ -18,6 +18,77 @@ The endpoint returns two main pieces of information:
 3.  **Get Recent Items**: It queries the `viral_queue_summary` view, ordering by the submission date descending and limiting the result to 10 to get the most recent jobs.
 4.  **Combine and Respond**: The statistics and the list of recent items are combined into a single JSON object and returned with a `200 OK` status.
 
+## Detailed Implementation Guide
+
+### Python (FastAPI)
+
+```python
+# In backend_api.py
+
+@app.get("/api/viral-ideas/queue-status")
+async def get_viral_ideas_queue_status(api_instance: ViralSpotAPI = Depends(get_api)):
+    """Get overall viral ideas queue status and statistics"""
+    try:
+        # Get queue statistics by counting items for each status
+        pending_result = api_instance.supabase.client.table('viral_ideas_queue').select('id', count='exact').eq('status', 'pending').execute()
+        # ... repeat for processing, completed, failed ...
+
+        # Get recent items from the summary view
+        recent_result = api_instance.supabase.client.table('viral_queue_summary').select(...).order('submitted_at', desc=True).limit(10).execute()
+
+        # ... combine and return the response ...
+
+    except Exception as e:
+        # ... error handling ...
+```
+
+**Line-by-Line Explanation:**
+
+1.  **`pending_result = ...`**: It runs a `COUNT` query for each status. This is simple but can be inefficient if the table is very large.
+2.  **`recent_result = ...`**: It fetches the 10 most recent items from the `viral_queue_summary` view for a quick overview of recent activity.
+
+### Nest.js (Mongoose)
+
+```typescript
+// In your viral-ideas.controller.ts
+
+@Get('/queue-status')
+async getQueueStatus() {
+  const result = await this.viralIdeasService.getQueueStatus();
+  return { success: true, data: result };
+}
+
+// In your viral-ideas.service.ts
+
+async getQueueStatus(): Promise<any> {
+  // Use `countDocuments` for efficiency
+  const pending = await this.viralIdeasQueueModel.countDocuments({ status: 'pending' });
+  const processing = await this.viralIdeasQueueModel.countDocuments({ status: 'processing' });
+  const completed = await this.viralIdeasQueueModel.countDocuments({ status: 'completed' });
+  const failed = await this.viralIdeasQueueModel.countDocuments({ status: 'failed' });
+
+  // Fetch recent items
+  const recentItems = await this.viralIdeasQueueModel
+    .find()
+    .sort({ createdAt: -1 })
+    .limit(10)
+    .exec();
+
+  // You might need to populate competitor data here as well if needed for the summary
+
+  return {
+    statistics: {
+      pending,
+      processing,
+      completed,
+      failed,
+      total: pending + processing + completed + failed,
+    },
+    recent_items: recentItems.map(item => ({ /* transform item */ })),
+  };
+}
+```
+
 ## Responses
 
 ### Success: 200 OK

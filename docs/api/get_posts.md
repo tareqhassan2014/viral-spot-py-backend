@@ -50,6 +50,64 @@ The filtering and sorting options for this endpoint are a subset of those availa
 3.  **Call Reels Logic**: Instead of duplicating code, it calls the same underlying function that the `/api/reels` endpoint uses, passing along all the query parameters and the hardcoded `content_type` filter.
 4.  **Execute and Respond**: The reels logic then handles the query building, execution, transformation, and response, just as it would for reels, but only returning posts.
 
+## Detailed Implementation Guide
+
+### Python (FastAPI)
+
+```python
+# In backend_api.py
+
+@app.get("/api/posts")
+async def get_posts(
+    # ... all the query parameters, same as /api/reels ...
+    api_instance: ViralSpotAPI = Depends(get_api)
+):
+    """Get posts with filtering and pagination"""
+    filters = ReelFilter(
+        # ... copies all query params ...
+        content_types='post' # Hardcodes the content type
+    )
+    result = await api_instance.get_reels(filters, limit, offset)
+    return APIResponse(success=True, data=result)
+```
+
+**Line-by-Line Explanation:**
+
+1.  **`@app.get("/api/posts")`**: The endpoint definition. It accepts the same filters as `/api/reels`.
+2.  **`filters = ReelFilter(...)`**: It creates the same filter object that `/api/reels` uses.
+3.  **`content_types='post'`**: This is the key line. It hardcodes the content type to `'post'`, ensuring that only posts are fetched.
+4.  **`result = await api_instance.get_reels(...)`**: It calls the exact same `get_reels` method from the API class, passing the modified filter object. This is a great example of code reuse.
+
+### Nest.js (Mongoose)
+
+```typescript
+// In your content.controller.ts
+
+@Get('/posts')
+async getPosts(@Query() queryParams: any) {
+  const { limit = 24, offset = 0, ...filters } = queryParams;
+  // Add the hardcoded filter
+  filters.content_types = 'post';
+  const result = await this.contentService.getReels(filters, limit, offset);
+  return { success: true, data: result };
+}
+
+// In your content.service.ts
+
+// No new method needed! The `getReels` service method can handle this.
+// You would just need to make sure your `getReels` method can handle
+// the `content_types` filter.
+
+async getReels(filters: any, limit: number, offset: number): Promise<any> {
+  const query = {};
+  // ...
+  if (filters.content_types) {
+    query['content_type'] = { $in: filters.content_types.split(',') };
+  }
+  // ... rest of the method
+}
+```
+
 ## Responses
 
 ### Success: 200 OK

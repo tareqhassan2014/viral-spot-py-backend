@@ -32,6 +32,79 @@ The response includes:
 4.  **Combine and Transform**: The data from these various tables is combined and transformed into a single, comprehensive JSON object.
 5.  **Send Response**: The final JSON object is returned with a `200 OK` status.
 
+## Detailed Implementation Guide
+
+### Python (FastAPI)
+
+```python
+# In backend_api.py
+
+@app.get("/api/viral-analysis/{queue_id}/results")
+async def get_viral_analysis_results(queue_id: str, ...):
+    """Get viral analysis results for a queue entry"""
+    try:
+        # 1. Get primary username from the queue table
+        queue_result = api_instance.supabase.client.table('viral_ideas_queue').select('primary_username').eq('id', queue_id).execute()
+
+        # 2. Get the analysis results from `viral_analysis_results` table
+        analysis_result = api_instance.supabase.client.table('viral_analysis_results').select(...).eq('queue_id', queue_id).order('analysis_run', desc=True).limit(1).execute()
+
+        # 3. Get the reels used in the analysis from `viral_analysis_reels` table
+        reels_result = api_instance.supabase.client.table('viral_analysis_reels').select(...).eq('analysis_id', analysis_id).execute()
+
+        # 4. Get competitor and primary profile data
+        # ... more queries ...
+
+        # 5. Combine all data into a single large response object and return
+        return APIResponse(success=True, data={...})
+
+    except Exception as e:
+        # ... error handling ...
+```
+
+**Line-by-Line Explanation:**
+
+This endpoint is a data aggregation endpoint. It performs multiple queries to different tables (`viral_ideas_queue`, `viral_analysis_results`, `viral_analysis_reels`, `primary_profiles`, etc.) to gather all the information related to a completed analysis. It then combines all of this data into a single, large JSON response for the frontend to display.
+
+### Nest.js (Mongoose)
+
+```typescript
+// In your viral-ideas.controller.ts
+
+@Get('/analysis/:queueId/results')
+async getAnalysisResults(@Param('queueId') queueId: string) {
+  const result = await this.viralIdeasService.getAnalysisResults(queueId);
+  // ... handle not found ...
+  return { success: true, data: result };
+}
+
+// In your viral-ideas.service.ts
+
+async getAnalysisResults(queueId: string): Promise<any> {
+  // Use .populate() to chain related data together.
+  // This assumes you have set up `ref` properties correctly in your Mongoose schemas.
+  const results = await this.viralAnalysisResultModel
+    .findOne({ queue_id: queueId })
+    .sort({ analysis_run: -1 })
+    .populate({
+      path: 'queue_id',
+      populate: [
+        { path: 'primary_profile_id' },
+        { path: 'competitors' } // Assuming a virtual populate
+      ]
+    })
+    .populate('reels') // Assuming `reels` is an array of refs
+    .exec();
+
+  if (!results) {
+    return null;
+  }
+
+  // Transform the heavily populated `results` object into the desired frontend structure.
+  return this.transformResultsForFrontend(results);
+}
+```
+
 ## Responses
 
 ### Success: 200 OK

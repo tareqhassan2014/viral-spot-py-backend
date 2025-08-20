@@ -23,6 +23,58 @@ It calls the internal `_fetch_basic_profile_data` method, which is responsible f
 3.  **Bypass Transformations**: This endpoint intentionally bypasses the standard data transformation and validation layers of the main application.
 4.  **Send Raw Response**: It returns the raw, untransformed data directly from the internal method, which is useful for debugging the underlying data source.
 
+## Detailed Implementation Guide
+
+### Python (FastAPI)
+
+```python
+# In backend_api.py
+
+@app.get("/api/debug/profile/{username}")
+async def debug_profile_fetch(username: str):
+    """Debug endpoint to test profile fetching directly"""
+    try:
+        similar_api = get_similar_api()
+        # Call the internal method directly for debugging
+        profile_data = await similar_api._fetch_basic_profile_data(username)
+
+        return APIResponse(
+            success=True,
+            data={ 'username': username, 'profile_data': profile_data, ... },
+            message=f"Debug fetch for @{username}"
+        )
+
+    except Exception as e:
+        # ... error handling ...
+```
+
+**Line-by-Line Explanation:**
+
+1.  **`similar_api = get_similar_api()`**: Gets an instance of the helper class.
+2.  **`await similar_api._fetch_basic_profile_data(username)`**: The key part is that it calls a private internal method (`_fetch_basic_profile_data`). This method is responsible for making the raw call to the external Instagram API. The endpoint then returns this raw data directly, bypassing any of the usual transformation, validation, or database interaction logic.
+
+### Nest.js (Mongoose)
+
+```typescript
+// In your debug.controller.ts
+
+@Get('/profile/:username')
+async debugProfileFetch(@Param('username') username: string) {
+  // Inject the external API service directly
+  const rawData = await this.externalApiService.getProfile(username);
+  return { success: true, data: rawData, message: `Debug fetch for @${username}` };
+}
+
+// In your external-api.service.ts
+
+async getProfile(username: string): Promise<any> {
+  // This method would contain the logic to call the third-party
+  // Instagram scraper API and return the raw JSON response.
+  const response = await this.httpService.post(...).toPromise();
+  return response.data;
+}
+```
+
 ## Responses
 
 ### Success: 200 OK
