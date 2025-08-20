@@ -34,6 +34,81 @@ This endpoint serves as the **primary batch processing trigger** for the viral i
 -   **Progress Tracking**: Real-time status updates for each job throughout the processing pipeline
 -   **Error Recovery**: Automatic retry logic for failed jobs and comprehensive error logging
 
+## Database Schema Details
+
+### Primary Tables Used
+
+This endpoint manages comprehensive batch processing across multiple viral analysis tables.
+
+#### 1. `viral_ideas_queue` Table
+
+Main queue table for batch processing management. **[View Complete Documentation](../database/viral_ideas_queue.md)**
+
+```sql
+-- Discovery Phase: Find pending and stuck jobs
+SELECT id, session_id, primary_username, status, priority,
+       submitted_at, started_processing_at, current_step,
+       progress_percentage, auto_rerun_enabled
+FROM viral_ideas_queue
+WHERE status = 'pending'
+   OR (status = 'processing' AND started_processing_at < NOW() - INTERVAL '1 minute')
+ORDER BY priority ASC, submitted_at ASC;
+
+-- Update Phase: Mark jobs as processing
+UPDATE viral_ideas_queue
+SET status = 'processing',
+    started_processing_at = NOW(),
+    current_step = 'Background batch processing started',
+    updated_at = NOW()
+WHERE id IN (discovered_job_ids);
+```
+
+-   **Purpose**: Queue discovery, priority management, and status coordination
+-   **Stuck Job Recovery**: Automatically detects and retries jobs processing >1 minute
+-   **Priority Ordering**: Processes high-priority jobs first (priority 1 = highest)
+-   **Batch Updates**: Efficiently updates multiple job statuses in single operations
+
+#### 2. `viral_queue_summary` View
+
+Used for comprehensive data assembly during processing. **[View Complete Documentation](../database/viral_queue_summary.md)**
+
+```sql
+-- Data assembly for each job during processing
+SELECT * FROM viral_queue_summary WHERE id = ?;
+```
+
+-   **Purpose**: Provides complete job context including extracted form data and competitor counts
+-   **Optimization**: Single query access to pre-joined queue and competitor information
+-   **Usage**: Feeds data to individual ViralIdeasProcessor instances
+
+#### 3. `viral_ideas_competitors` Table
+
+Competitor coordination for batch processing. **[View Complete Documentation](../database/viral_ideas_competitors.md)**
+
+```sql
+-- Get active competitors for each job
+SELECT competitor_username, selection_method
+FROM viral_ideas_competitors
+WHERE queue_id = ? AND is_active = TRUE;
+```
+
+-   **Purpose**: Drives competitor content fetching for each analysis job
+-   **Batch Coordination**: Manages competitor data across multiple simultaneous processing jobs
+-   **Resource Management**: Ensures only active competitors are processed
+
+#### 4. `viral_analysis_results` Table (Output)
+
+Destination for batch processing results. **[View Complete Documentation](../database/viral_analysis_results.md)**
+
+Results are written by individual ViralIdeasProcessor instances during background execution.
+
+### Batch Processing Strategy
+
+-   **Parallel Discovery**: Single query identifies all processable jobs with priority ordering
+-   **Concurrent Execution**: Multiple ViralIdeasProcessor instances run simultaneously
+-   **Resource Coordination**: Intelligent management of concurrent analysis jobs
+-   **Progress Aggregation**: Tracks progress across multiple simultaneous analyses
+
 ## Execution Flow
 
 1.  **Request Processing**: The endpoint receives a POST request with no required parameters for administrative batch processing.

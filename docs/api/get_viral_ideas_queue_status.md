@@ -29,6 +29,76 @@ The endpoint provides essential data for:
 -   **Recent Items**: Latest 10 queue entries with full metadata, form data, and competitor counts
 -   **Operational Metrics**: Processing timing, progress tracking, and system health indicators
 
+## Database Schema Details
+
+### Primary Tables and Views Used
+
+This endpoint provides comprehensive system monitoring through multiple database queries.
+
+#### 1. `viral_ideas_queue` Table
+
+Main queue table for status statistics and recent activity. **[View Complete Documentation](../database/viral_ideas_queue.md)**
+
+```sql
+-- Statistics Collection (4 parallel COUNT queries)
+SELECT COUNT(*) FROM viral_ideas_queue WHERE status = 'pending';
+SELECT COUNT(*) FROM viral_ideas_queue WHERE status = 'processing';
+SELECT COUNT(*) FROM viral_ideas_queue WHERE status = 'completed';
+SELECT COUNT(*) FROM viral_ideas_queue WHERE status = 'failed';
+
+-- Recent Activity Query
+SELECT id, session_id, primary_username, status, priority,
+       progress_percentage, submitted_at, started_processing_at,
+       completed_at, current_step, auto_rerun_enabled, total_runs
+FROM viral_ideas_queue
+ORDER BY submitted_at DESC
+LIMIT 10;
+```
+
+-   **Purpose**: Core statistics and recent activity monitoring
+-   **Statistics**: Real-time counts across all queue status categories
+-   **Recent Activity**: Latest 10 submissions with comprehensive metadata
+
+#### 2. `viral_queue_summary` View
+
+Enhanced queue data with pre-computed form fields. **[View Complete Documentation](../database/viral_queue_summary.md)**
+
+```sql
+-- Enhanced recent activity with form data
+SELECT *, content_type, target_audience, main_goals,
+       competitor_count, has_manual_competitors
+FROM viral_queue_summary
+WHERE id IN (recent_10_ids)
+ORDER BY submitted_at DESC;
+```
+
+-   **Purpose**: Enriched recent activity data with extracted form fields
+-   **Enhancement**: Pre-computed content strategy fields and competitor counts
+-   **Frontend Ready**: Data formatted for direct frontend consumption
+
+#### 3. `viral_ideas_competitors` Table
+
+Competitor statistics and counts. **[View Complete Documentation](../database/viral_ideas_competitors.md)**
+
+```sql
+-- Aggregate competitor statistics
+SELECT queue_id, COUNT(*) as competitor_count
+FROM viral_ideas_competitors
+WHERE is_active = TRUE
+GROUP BY queue_id;
+```
+
+-   **Purpose**: Provides competitor count aggregations for status display
+-   **Aggregation**: Groups active competitors by queue for statistics
+-   **Usage**: Enhances recent activity display with competitor context
+
+### Query Performance Strategy
+
+-   **Parallel Statistics**: 4 concurrent COUNT queries for real-time status numbers
+-   **Optimized Recent Activity**: Single query for latest 10 items with comprehensive metadata
+-   **View-Based Enhancement**: Uses `viral_queue_summary` for pre-computed form data
+-   **Efficient Aggregation**: Grouped competitor counts for comprehensive statistics
+
 ## Execution Flow
 
 1.  **Request Processing**: The endpoint receives a GET request with no parameters required.

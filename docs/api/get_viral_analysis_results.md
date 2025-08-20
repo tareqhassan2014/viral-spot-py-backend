@@ -1292,50 +1292,130 @@ async getAnalysisResults(queueId: string): Promise<any> {
 
 ### Core Tables (7 tables queried total)
 
+This endpoint performs comprehensive data aggregation from multiple viral analysis tables.
+
 #### 1. `viral_ideas_queue` (Entry Point)
 
--   **Purpose**: Tracks analysis job requests and status
+Tracks analysis job requests and status. **[View Complete Documentation](../database/viral_ideas_queue.md)**
+
+```sql
+-- Entry verification query
+SELECT primary_username FROM viral_ideas_queue WHERE id = ?;
+```
+
+-   **Purpose**: Verify queue exists and get primary username for subsequent queries
 -   **Key Fields**: `id`, `primary_username`, `status`, `content_strategy`
--   **Query**: Simple lookup to verify queue exists and get primary username
+-   **Query Pattern**: Simple lookup to validate queue existence
 
 #### 2. `viral_analysis_results` (Primary Results)
 
--   **Purpose**: Stores analysis metadata and main JSONB insights
--   **Key Fields**: `analysis_data` (JSONB), `workflow_version`, timing fields
--   **Query**: Latest analysis run (`ORDER BY analysis_run DESC LIMIT 1`)
--   **Critical**: Contains the main `analysis_data` JSONB field with all AI insights
+Stores analysis metadata and main JSONB insights. **[View Complete Documentation](../database/viral_analysis_results.md)**
 
-#### 3. `primary_profiles` (User Profile)
+```sql
+-- Latest analysis results query
+SELECT id, analysis_run, analysis_type, status, total_reels_analyzed,
+       primary_reels_count, competitor_reels_count, transcripts_fetched,
+       analysis_data, workflow_version, started_at, analysis_completed_at
+FROM viral_analysis_results
+WHERE queue_id = ?
+ORDER BY analysis_run DESC
+LIMIT 1;
+```
 
--   **Purpose**: Complete profile data for the analyzed user
--   **Fields**: 13 essential fields including metrics and image paths
--   **Query**: Single profile lookup by username with comprehensive field selection
+-   **Purpose**: Contains the main `analysis_data` JSONB field with all AI insights
+-   **Critical Field**: `analysis_data` (JSONB) - Complete AI analysis results
+-   **Query Pattern**: Latest analysis run for the queue
 
-#### 4. `viral_analysis_reels` (Analysis-Specific Reels)
+#### 3. `viral_analysis_reels` (Analysis-Specific Reels)
 
--   **Purpose**: Tracks exactly which reels were used in this specific analysis
--   **Fields**: Performance at analysis time, transcript status, hook analysis
--   **Query**: All reels for analysis ID, ordered by type and rank
+Tracks exactly which reels were used in this specific analysis. **[View Complete Documentation](../database/viral_analysis_reels.md)**
 
-#### 5. `content` (Source Content)
+```sql
+-- Analyzed reels with performance metadata
+SELECT content_id, reel_type, username, rank_in_selection,
+       view_count_at_analysis, like_count_at_analysis, comment_count_at_analysis,
+       transcript_completed, hook_text, power_words, analysis_metadata
+FROM viral_analysis_reels
+WHERE analysis_id = ?
+ORDER BY reel_type, rank_in_selection;
+```
 
--   **Purpose**: Full reel/post content data
--   **Query Strategy**:
-    -   **Primary**: Top 50 by view_count DESC
-    -   **Competitor**: Top 100 by outlier_score DESC
--   **JOIN**: Uses PostgreSQL foreign key to `primary_profiles` for enhanced data
+-   **Purpose**: Performance at analysis time, transcript status, hook analysis
+-   **Usage**: Shows exactly which reels contributed to the analysis insights
 
-#### 6. `viral_ideas_competitors` (Active Competitors)
+#### 4. `viral_scripts` (Generated Scripts)
 
--   **Purpose**: Tracks which competitors are active for this analysis
--   **Filter**: Only `is_active = TRUE` competitors included
--   **Query**: Simple list of competitor usernames for filtering
+Additional generated scripts from AI pipeline. **[View Complete Documentation](../database/viral_scripts.md)**
 
-#### 7. `viral_scripts` (Generated Scripts)
+```sql
+-- Generated scripts query
+SELECT id, script_title, script_content, script_type, estimated_duration,
+       target_audience, primary_hook, call_to_action, source_reels,
+       script_structure, status
+FROM viral_scripts
+WHERE analysis_id = ?
+ORDER BY created_at DESC;
+```
 
--   **Purpose**: Additional generated scripts from AI pipeline
--   **Fields**: 10 comprehensive script fields including metadata
--   **Query**: All scripts for analysis ID, ordered by creation date DESC
+-   **Purpose**: Complete viral scripts and summaries from the analysis
+-   **Usage**: Provides ready-to-use content scripts based on analysis
+
+#### 5. `viral_ideas_competitors` (Active Competitors)
+
+Tracks which competitors are active for this analysis. **[View Complete Documentation](../database/viral_ideas_competitors.md)**
+
+```sql
+-- Active competitors filter
+SELECT competitor_username FROM viral_ideas_competitors
+WHERE queue_id = ? AND is_active = TRUE;
+```
+
+-   **Purpose**: Identifies which competitor profiles were analyzed
+-   **Filter**: Only `is_active = TRUE` competitors included in results
+
+#### 6. `primary_profiles` (User Profile Data)
+
+Complete profile data for the analyzed user.
+
+```sql
+-- Primary profile comprehensive data
+SELECT username, profile_name, bio, followers, posts_count, is_verified,
+       profile_image_url, profile_image_path, account_type, total_reels,
+       median_views, total_views, total_likes, total_comments
+FROM primary_profiles
+WHERE username = ?;
+```
+
+-   **Purpose**: Complete user profile data with metrics and image paths
+-   **Fields**: 13 essential profile fields for comprehensive user context
+
+#### 7. `content` (Source Content)
+
+Full reel/post content data with profile relationships.
+
+```sql
+-- Primary user content with profile JOIN
+SELECT c.*, p.username, p.profile_name, p.followers, p.profile_image_url,
+       p.profile_image_path, p.is_verified, p.account_type
+FROM content c
+JOIN primary_profiles p ON c.profile_id = p.id
+WHERE c.username = ?
+ORDER BY c.view_count DESC
+LIMIT 50;
+
+-- Competitor content with profile JOIN
+SELECT c.*, p.username, p.profile_name, p.followers, p.profile_image_url,
+       p.profile_image_path, p.is_verified, p.account_type
+FROM content c
+JOIN primary_profiles p ON c.profile_id = p.id
+WHERE c.username IN (competitor_usernames)
+ORDER BY c.outlier_score DESC
+LIMIT 100;
+```
+
+-   **Purpose**: Source content data with enhanced profile context
+-   **JOIN Strategy**: Single-query JOINs for content + profile data
+-   **Optimization**: Primary (50 max), Competitor (100 max) content limits
 
 ### Database Performance Optimizations
 

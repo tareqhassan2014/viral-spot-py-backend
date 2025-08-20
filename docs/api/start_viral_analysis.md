@@ -51,6 +51,44 @@ The Start Viral Analysis endpoint provides comprehensive queue signaling and wor
 | :--------- | :----- | :------- | :---------------------------------------------------------- |
 | `queue_id` | string | ✅       | UUID identifier for the viral analysis queue entry to start |
 
+## Database Schema Details
+
+### Primary Table Used
+
+This endpoint manages viral analysis job state and worker coordination.
+
+#### `viral_ideas_queue` Table
+
+Main table for managing analysis job states and queue coordination. **[View Complete Documentation](../database/viral_ideas_queue.md)**
+
+```sql
+-- Step 1: Validate queue entry exists and get status
+SELECT id, status, primary_username, submitted_at, priority,
+       current_step, progress_percentage, session_id
+FROM viral_ideas_queue
+WHERE id = ?;
+
+-- Step 2: Update status to indicate processing signal sent
+UPDATE viral_ideas_queue
+SET status = 'signaled',
+    current_step = 'Queue signaled for processing',
+    signaled_at = NOW(),
+    updated_at = NOW()
+WHERE id = ?;
+```
+
+-   **Purpose**: Queue state management and worker process coordination
+-   **Status Transition**: Updates from 'pending' → 'signaled' to indicate worker signal sent
+-   **Worker Coordination**: Provides signal to background ViralIdeasProcessor workers
+-   **Progress Tracking**: Updates current_step to reflect signaling activity
+
+### Queue State Management
+
+-   **Signal Generation**: Creates processing signals for background workers to pick up
+-   **Status Validation**: Ensures queue entry is in appropriate state for processing
+-   **Priority Handling**: Maintains priority information for worker process ordering
+-   **Progress Coordination**: Updates progress metadata for frontend status displays
+
 ## Execution Flow
 
 1. **Request Validation**: Validate queue_id parameter format and ensure it meets UUID requirements

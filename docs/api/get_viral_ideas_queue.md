@@ -924,6 +924,54 @@ export const useQueueTracking = ({ sessionId, pollingInterval = 3000 }) => {
 };
 ```
 
+## Database Schema Details
+
+### Primary Data Sources
+
+This endpoint leverages optimized database views and tables for efficient status retrieval.
+
+#### 1. `viral_queue_summary` View
+
+Optimized view that pre-joins queue and competitor data. **[View Complete Documentation](../database/viral_queue_summary.md)**
+
+```sql
+-- Primary query using optimized view
+SELECT * FROM viral_queue_summary
+WHERE session_id = ?;
+
+-- View automatically provides:
+-- - All viral_ideas_queue fields
+-- - Extracted content_strategy fields (content_type, target_audience, main_goals)
+-- - Aggregated competitor counts
+-- - Pre-computed form data for frontend display
+```
+
+#### 2. `viral_ideas_competitors` Table
+
+Detailed competitor tracking for analysis jobs. **[View Complete Documentation](../database/viral_ideas_competitors.md)**
+
+```sql
+-- Secondary query for detailed competitor information
+SELECT competitor_username, processing_status, selection_method, added_at
+FROM viral_ideas_competitors
+WHERE queue_id = ?
+AND is_active = TRUE
+ORDER BY added_at ASC;
+```
+
+#### 3. `viral_ideas_queue` Table (Underlying Data)
+
+Core queue table containing job metadata. **[View Complete Documentation](../database/viral_ideas_queue.md)**
+
+The `viral_queue_summary` view is built on top of this table, providing all 20 columns plus computed fields.
+
+### Query Optimization Strategy
+
+-   **Single View Query**: Uses `viral_queue_summary` to eliminate complex JOINs
+-   **Targeted Competitor Query**: Separate query for detailed competitor metadata
+-   **Indexed Lookups**: Fast session-based retrieval with unique index
+-   **Selective Fields**: Returns only necessary fields for frontend consumption
+
 ## Implementation Details
 
 ### File Locations and Functions

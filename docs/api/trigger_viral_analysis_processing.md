@@ -51,6 +51,65 @@ The Trigger Viral Analysis Processing endpoint provides comprehensive immediate 
 | :--------- | :----- | :------- | :------------------------------------------------------------------------ |
 | `queue_id` | string | ✅       | UUID identifier for the viral analysis queue entry to process immediately |
 
+## Database Schema Details
+
+### Primary Tables Used
+
+This endpoint performs immediate processing using comprehensive data from multiple tables.
+
+#### 1. `viral_queue_summary` View
+
+Optimized view providing comprehensive queue and competitor data. **[View Complete Documentation](../database/viral_queue_summary.md)**
+
+```sql
+-- Comprehensive queue data with pre-joined competitor information
+SELECT * FROM viral_queue_summary WHERE id = ?;
+```
+
+-   **Purpose**: Single-query access to complete queue metadata plus aggregated competitor counts
+-   **Optimization**: Eliminates need for multiple JOINs in application code
+-   **Data**: All 19 columns including extracted content_strategy fields and competitor counts
+
+#### 2. `viral_ideas_competitors` Table
+
+Active competitor tracking for processing. **[View Complete Documentation](../database/viral_ideas_competitors.md)**
+
+```sql
+-- Get active competitors for the analysis
+SELECT competitor_username, selection_method, processing_status
+FROM viral_ideas_competitors
+WHERE queue_id = ? AND is_active = TRUE
+ORDER BY added_at;
+```
+
+-   **Purpose**: Identifies which competitor profiles to include in immediate processing
+-   **Filter**: Only active competitors to ensure current data
+-   **Usage**: Drives competitor content fetching in ViralIdeasProcessor
+
+#### 3. `viral_analysis_results` Table (Output)
+
+Stores processing results from immediate execution. **[View Complete Documentation](../database/viral_analysis_results.md)**
+
+```sql
+-- Results are written during processing execution
+INSERT INTO viral_analysis_results (
+    queue_id, analysis_run, analysis_type, status,
+    total_reels_analyzed, analysis_data, workflow_version,
+    started_at, analysis_completed_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+```
+
+-   **Purpose**: Destination for immediate processing results
+-   **Critical Field**: `analysis_data` (JSONB) contains complete AI insights
+-   **Timing**: Written during background asyncio task execution
+
+### Immediate Processing Strategy
+
+-   **Data Assembly**: Single comprehensive query using optimized view
+-   **Worker Instantiation**: Direct ViralIdeasProcessor creation with full data context
+-   **Background Execution**: Asyncio create_task for non-blocking immediate processing
+-   **Resource Management**: Intelligent resource allocation for concurrent analysis jobs
+
 ## Execution Flow
 
 1. **Request Validation**: Validate queue_id parameter format and ensure it meets UUID requirements

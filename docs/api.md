@@ -148,3 +148,24 @@ This document outlines the REST API endpoints available in the ViralSpot backend
 3.  **GET `/api/debug/profile/{username}` 🐛 DEBUG** ([Details](./api/debug_profile_fetch.md))
     -   **Description:** A debug endpoint to get raw or extended data for a profile.
     -   **Usage:** For internal testing and development purposes.
+
+## Related Database Tables
+
+The API endpoints interact with the following database tables and views:
+
+### Core Profile System
+
+-   **`primary_profiles`**: ([Details](./database/primary_profiles.md)) - Main profiles data used by profile endpoints
+-   **`secondary_profiles`**: ([Details](./database/secondary_profiles.md)) - Similar profiles discovered during analysis
+-   **`content`**: ([Details](./database/content.md)) - Individual reels and posts content
+-   **`queue`**: ([Details](./database/queue.md)) - Task queue for profile processing
+-   **`similar_profiles`**: ([Details](./database/similar_profiles.md)) - Similar profile relationships
+
+### Viral Analysis System
+
+-   **`viral_ideas_queue`**: ([Details](./database/viral_ideas_queue.md)) - Central queue for viral analysis jobs
+-   **`viral_ideas_competitors`**: ([Details](./database/viral_ideas_competitors.md)) - Competitor selections for each analysis
+-   **`viral_queue_summary`**: ([Details](./database/viral_queue_summary.md)) - Optimized view for queue data with competitor counts
+-   **`viral_analysis_results`**: ([Details](./database/viral_analysis_results.md)) - AI analysis results and output
+-   **`viral_analysis_reels`**: ([Details](./database/viral_analysis_reels.md)) - Specific reels used in each analysis
+-   **`viral_scripts`**: ([Details](./database/viral_scripts.md)) - Generated scripts from analysis

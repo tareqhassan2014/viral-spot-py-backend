@@ -1308,6 +1308,47 @@ wait
 echo "✅ Load testing completed"
 ```
 
+## Database Schema Details
+
+### Primary Table Used
+
+This endpoint queries the viral ideas queue to find existing analysis data.
+
+#### `viral_ideas_queue` Table
+
+Main table for tracking analysis jobs and preventing duplicates. **[View Complete Documentation](../database/viral_ideas_queue.md)**
+
+```sql
+-- Key queries executed by this endpoint
+
+-- Phase 1: Search for completed analyses (highest priority)
+SELECT id, session_id, primary_username, status, progress_percentage,
+       submitted_at, started_processing_at, completed_at, error_message,
+       current_step, priority, auto_rerun_enabled, total_runs
+FROM viral_ideas_queue
+WHERE primary_username = ?
+AND status = 'completed'
+ORDER BY completed_at DESC
+LIMIT 1;
+
+-- Phase 2: Search for active analyses (fallback)
+SELECT id, session_id, primary_username, status, progress_percentage,
+       submitted_at, started_processing_at, completed_at, error_message,
+       current_step, priority, auto_rerun_enabled, total_runs
+FROM viral_ideas_queue
+WHERE primary_username = ?
+AND status IN ('pending', 'processing')
+ORDER BY submitted_at DESC
+LIMIT 1;
+```
+
+### Discovery Strategy
+
+-   **Priority Search**: Completed analyses first for immediate result access
+-   **Fallback Search**: Active analyses to prevent duplicate job creation
+-   **Duplicate Prevention**: Returns existing data instead of creating new jobs
+-   **Resource Optimization**: Prevents unnecessary processing through intelligent discovery
+
 ## Implementation Details
 
 ### File Locations

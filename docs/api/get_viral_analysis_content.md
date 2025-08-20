@@ -31,6 +31,61 @@ This is essential for the frontend to be able to display the original content al
 5.  **Apply Pagination**: The `limit` and `offset` parameters are used for pagination.
 6.  **Execute and Respond**: The query is executed, the results are transformed, and the paginated list of content is returned with a `200 OK` status.
 
+## Database Schema Details
+
+### Primary Tables Used
+
+This endpoint retrieves analyzed content through a two-step database query process.
+
+#### 1. `viral_analysis_reels` Table
+
+Tracks exactly which reels were used in the specific analysis. **[View Complete Documentation](../database/viral_analysis_reels.md)**
+
+```sql
+-- Step 1: Get content IDs that were part of the analysis
+SELECT content_id, reel_type, username, rank_in_selection,
+       view_count_at_analysis, like_count_at_analysis, comment_count_at_analysis,
+       transcript_completed, hook_text, power_words, analysis_metadata
+FROM viral_analysis_reels
+WHERE analysis_id = ?
+ORDER BY reel_type, rank_in_selection;
+```
+
+-   **Purpose**: Identifies which specific reels contributed to the analysis insights
+-   **Key Fields**: `content_id`, `reel_type`, `username`, performance metrics at analysis time
+-   **Usage**: Source of truth for which content was actually analyzed
+
+#### 2. `content` Table
+
+Full reel/post content data with profile relationships.
+
+```sql
+-- Step 2: Get full content data for analyzed reels
+SELECT c.*,
+       p.username, p.profile_name, p.followers, p.profile_image_url,
+       p.profile_image_path, p.is_verified, p.account_type
+FROM content c
+JOIN primary_profiles p ON c.profile_id = p.id
+WHERE c.content_id IN (analyzed_content_ids)
+AND (? = 'all' OR
+     (? = 'primary' AND c.username = primary_username) OR
+     (? = 'competitor' AND c.username != primary_username))
+ORDER BY c.view_count DESC
+LIMIT ? OFFSET ?;
+```
+
+-   **Purpose**: Complete content data with profile context for analyzed reels
+-   **Filtering**: Supports primary-only, competitor-only, or all content filtering
+-   **Pagination**: Implements limit/offset pagination for large result sets
+
+### Query Flow Strategy
+
+1. **Analysis Verification**: Verify the analysis exists and get primary username
+2. **Content Discovery**: Query `viral_analysis_reels` to find analyzed content IDs
+3. **Content Enrichment**: Query `content` table with profile JOINs for full data
+4. **Type Filtering**: Apply content_type filter (all/primary/competitor)
+5. **Pagination**: Apply limit/offset for manageable response sizes
+
 ## Detailed Implementation Guide
 
 ### Python (FastAPI)

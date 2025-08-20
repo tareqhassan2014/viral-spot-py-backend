@@ -657,6 +657,50 @@ await viralAnalysisQueue.add("process-viral-ideas", {
 
 Returned if there is a failure in creating the queue entry or linking the competitors.
 
+## Database Schema Details
+
+### Primary Tables Used
+
+This endpoint creates records in two core tables:
+
+#### 1. `viral_ideas_queue` Table
+
+Primary table for storing viral analysis job requests. **[View Complete Documentation](../database/viral_ideas_queue.md)**
+
+```sql
+-- Key fields created by this endpoint
+INSERT INTO viral_ideas_queue (
+    session_id,           -- Unique session identifier
+    primary_username,     -- User requesting analysis
+    content_strategy,     -- JSONB field with form data
+    status,               -- Initially set to 'pending'
+    priority,             -- Default priority of 5
+    submitted_at          -- Auto-generated timestamp
+);
+```
+
+#### 2. `viral_ideas_competitors` Table
+
+Stores competitor selections for each analysis job. **[View Complete Documentation](../database/viral_ideas_competitors.md)**
+
+```sql
+-- Competitor records created for each selected competitor
+INSERT INTO viral_ideas_competitors (
+    queue_id,                -- References viral_ideas_queue.id
+    competitor_username,     -- Username from selected_competitors array
+    selection_method,        -- Set to 'manual' for form submissions
+    is_active,              -- Set to TRUE for active competitors
+    processing_status,      -- Initially set to 'pending'
+    added_at               -- Auto-generated timestamp
+);
+```
+
+### Database Relationships
+
+-   **One-to-Many**: `viral_ideas_queue` → `viral_ideas_competitors` (one analysis job can have multiple competitors)
+-   **Foreign Key**: `viral_ideas_competitors.queue_id` → `viral_ideas_queue.id`
+-   **Cascade Behavior**: Deleting a queue entry will remove associated competitor records
+
 ## Implementation Details
 
 -   **File:** `backend_api.py`
