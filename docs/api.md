@@ -4,6 +4,20 @@ This document outlines the REST API endpoints available in the ViralSpot backend
 
 ## Main API (`backend_api.py`)
 
+**Total Endpoints:** 27 active endpoints serving frontend, administrative, and debugging needs.
+
+### Root & Health Endpoints
+
+1.  **GET `/`**
+
+    -   **Description:** Root endpoint providing API status and availability information.
+    -   **Usage:** Basic API health check and service discovery.
+
+2.  **GET `/health`**
+
+    -   **Description:** Comprehensive health check endpoint with detailed service status.
+    -   **Usage:** Monitoring API availability, Supabase connectivity, and service dependencies.
+
 ### Profile Endpoints
 
 1.  **GET `/api/profile/{username}`** ([Details](./api/get_profile.md))
@@ -23,25 +37,31 @@ This document outlines the REST API endpoints available in the ViralSpot backend
 
 4.  **GET `/api/profile/{username}/similar-fast` ⚡ NEW** ([Details](./api/get_similar_profiles_fast.md))
 
-    -   **Description:** A new, faster endpoint for retrieving similar profiles.
-    -   **Usage:** An optimized alternative to the standard `/similar` endpoint.
+    -   **Description:** A new, faster endpoint for retrieving similar profiles with 24hr caching.
+    -   **Usage:** An optimized alternative to the standard `/similar` endpoint with CDN-delivered images.
 
-5.  **GET `/api/profile/{username}/secondary`** ([Details](./api/get_secondary_profile.md))
+5.  **DELETE `/api/profile/{username}/similar-cache` ⚡ NEW**
+
+    -   **Description:** Clears cached similar profiles data for a specific username.
+    -   **Usage:** Cache management and data refresh for similar profiles optimization.
+
+6.  **GET `/api/profile/{username}/secondary`** ([Details](./api/get_secondary_profile.md))
 
     -   **Description:** Retrieves secondary (discovered) profiles associated with a primary profile.
     -   **Usage:** Can be used to show how the network of profiles is expanding.
 
-6.  **GET `/api/profile/{username}/status`** ([Details](./api/check_profile_status.md))
+7.  **GET `/api/profile/{username}/status`** ([Details](./api/check_profile_status.md))
 
     -   **Description:** Checks the processing status of a profile.
     -   **Usage:** Allows the frontend to poll for updates after requesting a profile to be processed.
 
-7.  **POST `/api/profile/{username}/request`** ([Details](./api/request_profile_processing.md))
+8.  **POST `/api/profile/{username}/request`** ([Details](./api/request_profile_processing.md))
 
     -   **Description:** Submits a request to scrape and analyze a new profile.
     -   **Usage:** The primary way for users to add new profiles to the system.
 
-8.  **POST `/api/profile/{primary_username}/add-competitor/{target_username}` ⚡ NEW** ([Details](./api/add_manual_competitor.md))
+9.  **POST `/api/profile/{primary_username}/add-competitor/{target_username}` ⚡ NEW** ([Details](./api/add_manual_competitor.md))
+
     -   **Description:** Adds a `target_username` as a competitor to a `primary_username`.
     -   **Usage:** Part of a new competitor analysis feature.
 
@@ -78,32 +98,38 @@ This document outlines the REST API endpoints available in the ViralSpot backend
     -   **Description:** Retrieves the status of a specific viral ideas analysis job from the queue.
     -   **Usage:** Polling for real-time updates on the analysis progress.
 
-3.  **POST `/api/viral-ideas/queue/{queue_id}/start` ⚡ NEW** ([Details](./api/start_viral_analysis.md))
+3.  **GET `/api/viral-ideas/check-existing/{username}` ⚡ NEW**
 
-    -   **Description:** Starts a queued analysis job.
-    -   **Usage:** Manually triggers the processing of a specific job.
+    -   **Description:** Checks if there's already an existing analysis (completed or active) for a profile.
+    -   **Usage:** Prevents duplicate analysis creation and enables loading existing results.
 
-4.  **POST `/api/viral-ideas/queue/{queue_id}/process` ⚡ NEW** ([Details](./api/trigger_viral_analysis_processing.md))
+4.  **POST `/api/viral-ideas/queue/{queue_id}/start` ⚡ NEW** ([Details](./api/start_viral_analysis.md))
 
-    -   **Description:** Triggers the processing of a specific item in the queue.
-    -   **Usage:** Internal or manual trigger for processing.
+    -   **Description:** Signals a queued analysis job as ready for background worker processing.
+    -   **Usage:** Queue signaling and worker coordination for viral analysis jobs.
 
-5.  **GET `/api/viral-ideas/queue-status` ⚡ NEW** ([Details](./api/get_viral_ideas_queue_status.md))
+5.  **POST `/api/viral-ideas/queue/{queue_id}/process` ⚡ NEW** ([Details](./api/trigger_viral_analysis_processing.md))
 
-    -   **Description:** Gets overall statistics for the viral ideas queue.
-    -   **Usage:** A dashboard-like feature to monitor the health of the processing queue.
+    -   **Description:** Immediately triggers the processing of a specific item in the queue.
+    -   **Usage:** Administrative tool for immediate processing, debugging, and manual intervention.
 
 6.  **POST `/api/viral-ideas/process-pending` ⚡ NEW** ([Details](./api/process_pending_viral_ideas.md))
 
     -   **Description:** Processes all pending items in the viral ideas queue.
-    -   **Usage:** A batch operation to clear the queue.
+    -   **Usage:** A batch operation to clear the queue and process multiple jobs.
 
-7.  **GET `/api/viral-analysis/{queue_id}/results` ⚡ NEW** ([Details](./api/get_viral_analysis_results.md))
+7.  **GET `/api/viral-ideas/queue-status` ⚡ NEW** ([Details](./api/get_viral_ideas_queue_status.md))
+
+    -   **Description:** Gets overall statistics for the viral ideas queue.
+    -   **Usage:** A dashboard-like feature to monitor the health of the processing queue.
+
+8.  **GET `/api/viral-analysis/{queue_id}/results` ⚡ NEW** ([Details](./api/get_viral_analysis_results.md))
 
     -   **Description:** Retrieves the final results of a viral analysis job.
     -   **Usage:** Fetches the data to be displayed on the frontend once an analysis is complete.
 
-8.  **GET `/api/viral-analysis/{queue_id}/content` ⚡ NEW** ([Details](./api/get_viral_analysis_content.md))
+9.  **GET `/api/viral-analysis/{queue_id}/content` ⚡ NEW** ([Details](./api/get_viral_analysis_content.md))
+
     -   **Description:** Retrieves the content that was analyzed as part of a job.
     -   **Usage:** To show the source content alongside the analysis results.
 
