@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProfileModule } from './profile/profile.module';
+import { ViralModule } from './viral/viral.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { ProfileModule } from './profile/profile.module';
       // Add connection options if needed
     }),
     ProfileModule,
+    ViralModule,
   ],
   controllers: [AppController],
   providers: [AppService],
