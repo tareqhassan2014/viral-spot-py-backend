@@ -111,7 +111,7 @@ export class SecondaryProfile {
   @Prop({ type: Date })
   analysis_timestamp: Date;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'PrimaryProfile' })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: PrimaryProfile.name })
   discovered_by_id: PrimaryProfile;
 }
 

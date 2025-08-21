@@ -1,3 +1,4 @@
+import { ViralIdeasQueue } from '@/viral/entities/viral-ideas-queue.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 
@@ -7,7 +8,7 @@ export type ViralIdeasCompetitorDocument = ViralIdeasCompetitor & Document;
 export class ViralIdeasCompetitor {
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: 'ViralIdeasQueue',
+    ref: ViralIdeasQueue.name,
     required: true,
     index: true,
   })

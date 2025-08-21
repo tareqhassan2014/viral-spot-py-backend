@@ -1,3 +1,4 @@
+import { PrimaryProfile } from '@/profile/schemas/primary-profile.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 
@@ -103,7 +104,7 @@ export class Content {
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: 'PrimaryProfile',
+    ref: PrimaryProfile.name,
     index: true,
   })
   profile_id: MongooseSchema.Types.ObjectId; // Reference to PrimaryProfile

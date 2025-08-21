@@ -1,13 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 
+import { ViralIdeasQueue } from 'src/viral/entities/viral-ideas-queue.schema';
+
 export type ViralAnalysisResultsDocument = ViralAnalysisResults & Document;
 
 @Schema({ timestamps: true, collection: 'viral_analysis_results' })
 export class ViralAnalysisResults {
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: 'ViralIdeasQueue',
+    ref: ViralIdeasQueue.name,
     required: true,
     index: true,
   })

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
+import { ViralAnalysisResults } from './viral-analysis-results.schema';
 
 export type ViralAnalysisReelsDocument = ViralAnalysisReels & Document;
 
@@ -10,7 +11,7 @@ export type ViralAnalysisReelsDocument = ViralAnalysisReels & Document;
 export class ViralAnalysisReels {
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: 'ViralAnalysisResults',
+    ref: ViralAnalysisResults.name,
     required: true,
     index: true,
   })
