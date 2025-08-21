@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Content, ContentSchema } from '../content/schemas/content.schema';
 import { ProfileController } from './profile.controller';
-import { ProfileService } from './profile.service';
 import {
   PrimaryProfile,
   PrimaryProfileSchema,
@@ -29,37 +28,35 @@ import { SimilarProfilesService } from './services/similar-profiles.service';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: PrimaryProfile.name, schema: PrimaryProfileSchema },
-      { name: SecondaryProfile.name, schema: SecondaryProfileSchema },
-      { name: SimilarProfile.name, schema: SimilarProfileSchema },
       { name: Queue.name, schema: QueueSchema },
       { name: Content.name, schema: ContentSchema },
+      { name: SimilarProfile.name, schema: SimilarProfileSchema },
+      { name: PrimaryProfile.name, schema: PrimaryProfileSchema },
+      { name: SecondaryProfile.name, schema: SecondaryProfileSchema },
     ]),
   ],
   controllers: [ProfileController],
   providers: [
-    ProfileService,
     CompetitorService,
-    ProfileRetrievalService,
     ProfileReelsService,
-    SimilarProfilesService,
-    SimilarProfilesFastService,
     ProfileStatusService,
-    SimilarProfilesCacheService,
-    SecondaryProfileService,
     ProfileRequestService,
+    SimilarProfilesService,
+    ProfileRetrievalService,
+    SecondaryProfileService,
+    SimilarProfilesFastService,
+    SimilarProfilesCacheService,
   ],
   exports: [
-    ProfileService,
     CompetitorService,
-    ProfileRetrievalService,
     ProfileReelsService,
-    SimilarProfilesService,
-    SimilarProfilesFastService,
     ProfileStatusService,
-    SimilarProfilesCacheService,
-    SecondaryProfileService,
     ProfileRequestService,
+    SimilarProfilesService,
+    ProfileRetrievalService,
+    SecondaryProfileService,
+    SimilarProfilesFastService,
+    SimilarProfilesCacheService,
   ],
 })
 export class ProfileModule {}

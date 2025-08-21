@@ -20,7 +20,6 @@ import {
   GetSimilarProfilesQueryDto,
   GetSimilarProfilesResponseDto,
 } from './dto/similar-profiles.dto';
-import { ProfileService } from './profile.service';
 import { CompetitorService } from './services/competitor.service';
 import { ProfileReelsService } from './services/profile-reels.service';
 import { ProfileRequestService } from './services/profile-request.service';
@@ -34,7 +33,6 @@ import { SimilarProfilesService } from './services/similar-profiles.service';
 @Controller('/profile')
 export class ProfileController {
   constructor(
-    private readonly profileService: ProfileService,
     private readonly competitorService: CompetitorService,
     private readonly profileRetrievalService: ProfileRetrievalService,
     private readonly profileReelsService: ProfileReelsService,
