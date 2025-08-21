@@ -16,20 +16,6 @@ export class ViralQueueService {
   ) {}
 
   /**
-   * Retrieves the status of a specific viral ideas analysis job from the queue
-   */
-  getViralIdeasQueueStatus(sessionId: string) {
-    return {
-      message: `Getting queue status for session ${sessionId}`,
-      sessionId,
-      status: 'processing', // queued, processing, completed, failed
-      progress: 45,
-      estimatedTimeRemaining: '2 minutes',
-      // TODO: Implement actual status retrieval logic
-    };
-  }
-
-  /**
    * Signals a queued analysis job as ready for background worker processing
    */
   startViralAnalysisProcessing(queueId: string) {

@@ -23,30 +23,33 @@ import {
 import { ViralAnalysisService } from './services/viral-analysis.service';
 import { ViralDiscoveryService } from './services/viral-discovery.service';
 import { ViralIdeasQueueCreationService } from './services/viral-ideas-queue-creation.service';
+import { ViralIdeasQueueStatusService } from './services/viral-ideas-queue-status.service';
 import { ViralQueueService } from './services/viral-queue.service';
 import { ViralController } from './viral.controller';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
+      { name: ViralScripts.name, schema: ViralScriptsSchema },
       { name: ViralIdeasQueue.name, schema: ViralIdeasQueueSchema },
+      { name: ViralAnalysisReels.name, schema: ViralAnalysisReelsSchema },
       { name: ViralIdeasCompetitor.name, schema: ViralIdeasCompetitorSchema },
       { name: ViralAnalysisResults.name, schema: ViralAnalysisResultsSchema },
-      { name: ViralAnalysisReels.name, schema: ViralAnalysisReelsSchema },
-      { name: ViralScripts.name, schema: ViralScriptsSchema },
     ]),
   ],
   controllers: [ViralController],
   providers: [
-    ViralDiscoveryService,
     ViralQueueService,
     ViralAnalysisService,
+    ViralDiscoveryService,
+    ViralIdeasQueueStatusService,
     ViralIdeasQueueCreationService,
   ],
   exports: [
-    ViralDiscoveryService,
     ViralQueueService,
     ViralAnalysisService,
+    ViralDiscoveryService,
+    ViralIdeasQueueStatusService,
     ViralIdeasQueueCreationService,
   ],
 })

@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ViralDiscoveryResponseDto } from './dto/viral-discovery-response.dto';
+import { GetViralIdeasQueueStatusResponseDto } from './dto/viral-ideas-queue-status.dto';
 import {
   CreateViralIdeasQueueDto,
   CreateViralIdeasQueueResponseDto,
@@ -7,6 +8,7 @@ import {
 import { ViralAnalysisService } from './services/viral-analysis.service';
 import { ViralDiscoveryService } from './services/viral-discovery.service';
 import { ViralIdeasQueueCreationService } from './services/viral-ideas-queue-creation.service';
+import { ViralIdeasQueueStatusService } from './services/viral-ideas-queue-status.service';
 import { ViralQueueService } from './services/viral-queue.service';
 
 @Controller('/viral')
@@ -16,6 +18,7 @@ export class ViralController {
     private readonly queueService: ViralQueueService,
     private readonly analysisService: ViralAnalysisService,
     private readonly queueCreationService: ViralIdeasQueueCreationService,
+    private readonly queueStatusService: ViralIdeasQueueStatusService,
   ) {}
 
   /**
@@ -38,12 +41,20 @@ export class ViralController {
 
   /**
    * GET /api/viral-ideas/queue/{session_id} ⚡ NEW
-   * Description: Retrieves the status of a specific viral ideas analysis job from the queue.
-   * Usage: Polling for real-time updates on the analysis progress.
+   * Retrieves the status of a specific viral ideas analysis job from the queue
+   *
+   * This endpoint fetches comprehensive queue status information including progress,
+   * content strategy details, and associated competitors. It's designed for real-time
+   * polling to track analysis progress and provide detailed status updates.
+   *
+   * @param sessionId - The unique session identifier for the queue entry
+   * @returns Promise<GetViralIdeasQueueStatusResponseDto> - Complete queue status with competitors
    */
   @Get('/ideas/queue/:session_id')
-  getViralIdeasQueueStatus(@Param('session_id') sessionId: string) {
-    return this.queueService.getViralIdeasQueueStatus(sessionId);
+  async getViralIdeasQueueStatus(
+    @Param('session_id') sessionId: string,
+  ): Promise<GetViralIdeasQueueStatusResponseDto> {
+    return await this.queueStatusService.getViralIdeasQueueStatus(sessionId);
   }
 
   /**

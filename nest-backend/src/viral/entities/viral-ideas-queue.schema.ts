@@ -1,7 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 
-export type ViralIdeasQueueDocument = ViralIdeasQueue & Document;
+export type ViralIdeasQueueDocument = ViralIdeasQueue &
+  Document & {
+    _id: Types.ObjectId;
+  };
 
 @Schema({ timestamps: true, collection: 'viral_ideas_queue' })
 export class ViralIdeasQueue {
