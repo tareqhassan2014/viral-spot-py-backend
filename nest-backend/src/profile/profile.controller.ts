@@ -8,6 +8,10 @@ import {
 import { GetProfileResponseDto } from './dto/profile-response.dto';
 import { ProfileStatusResponseDto } from './dto/profile-status-response.dto';
 import {
+  GetSimilarProfilesFastQueryDto,
+  GetSimilarProfilesFastResponseDto,
+} from './dto/similar-profiles-fast.dto';
+import {
   GetSimilarProfilesQueryDto,
   GetSimilarProfilesResponseDto,
 } from './dto/similar-profiles.dto';
@@ -17,6 +21,7 @@ import { ProfileReelsService } from './services/profile-reels.service';
 import { ProfileRetrievalService } from './services/profile-retrieval.service';
 import { ProfileStatusService } from './services/profile-status.service';
 import { SimilarProfilesCacheService } from './services/similar-profiles-cache.service';
+import { SimilarProfilesFastService } from './services/similar-profiles-fast.service';
 import { SimilarProfilesService } from './services/similar-profiles.service';
 
 @Controller('/profile')
@@ -27,6 +32,7 @@ export class ProfileController {
     private readonly profileRetrievalService: ProfileRetrievalService,
     private readonly profileReelsService: ProfileReelsService,
     private readonly similarProfilesService: SimilarProfilesService,
+    private readonly similarProfilesFastService: SimilarProfilesFastService,
     private readonly profileStatusService: ProfileStatusService,
     private readonly cacheService: SimilarProfilesCacheService,
   ) {}
@@ -90,13 +96,24 @@ export class ProfileController {
   }
 
   /**
-   * GET /api/profile/{username}/similar-fast ⚡ NEW
-   * Description: A new, faster endpoint for retrieving similar profiles with 24hr caching.
-   * Usage: An optimized alternative to the standard /similar endpoint with CDN-delivered images.
+   * GET /api/profile/{username}/similar-fast ⚡
+   * High-Performance Similar Profiles with Advanced Caching and CDN Optimization
+   *
+   * Description: Optimized endpoint for retrieving similar profiles with 24-hour caching,
+   * CDN-delivered images, and intelligent fallback strategies. Supports up to 80 profiles
+   * per request with lightning-fast cached responses and comprehensive retry logic.
+   * Usage: High-performance profile recommendations, cached content discovery, and optimized user experience.
    */
   @Get('/:username/similar-fast')
-  getSimilarProfilesFast(@Param('username') username: string) {
-    return this.profileService.getSimilarProfilesFast(username);
+  async getSimilarProfilesFast(
+    @Param('username') username: string,
+    @Query() query: GetSimilarProfilesFastQueryDto,
+  ): Promise<GetSimilarProfilesFastResponseDto> {
+    return await this.similarProfilesFastService.getSimilarProfilesFast(
+      username,
+      query.limit,
+      query.force_refresh,
+    );
   }
 
   /**
