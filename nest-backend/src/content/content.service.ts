@@ -67,36 +67,4 @@ export class ContentService {
       // TODO: Implement actual posts retrieval with MongoDB queries
     };
   }
-
-  /**
-   * Fetches content from a competitor's profile
-   */
-  getCompetitorContent(username: string) {
-    return {
-      message: `Getting competitor content for ${username}`,
-      username,
-      data: {
-        profile: {
-          username,
-          displayName: '',
-          followerCount: 0,
-          followingCount: 0,
-          postCount: 0,
-        },
-        content: {
-          reels: [],
-          posts: [],
-          stories: [],
-        },
-        analytics: {
-          avgViews: 0,
-          avgLikes: 0,
-          avgComments: 0,
-          engagementRate: 0,
-        },
-        lastUpdated: new Date().toISOString(),
-      },
-      // TODO: Implement actual competitor content fetching logic
-    };
-  }
 }

@@ -7,6 +7,7 @@ import {
 import { ContentController } from './content.controller';
 import { ContentService } from './content.service';
 import { Content, ContentSchema } from './schemas/content.schema';
+import { CompetitorContentService } from './services/competitor-content.service';
 import { UserContentService } from './services/user-content.service';
 
 @Module({
@@ -17,7 +18,7 @@ import { UserContentService } from './services/user-content.service';
     ]),
   ],
   controllers: [ContentController],
-  providers: [ContentService, UserContentService],
-  exports: [ContentService, UserContentService],
+  providers: [ContentService, UserContentService, CompetitorContentService],
+  exports: [ContentService, UserContentService, CompetitorContentService],
 })
 export class ContentModule {}

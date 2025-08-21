@@ -1,9 +1,14 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ContentService } from './content.service';
 import {
+  GetCompetitorContentQueryDto,
+  GetCompetitorContentResponseDto,
+} from './dto/get-competitor-content.dto';
+import {
   GetUserContentQueryDto,
   GetUserContentResponseDto,
 } from './dto/get-user-content.dto';
+import { CompetitorContentService } from './services/competitor-content.service';
 import { UserContentService } from './services/user-content.service';
 
 @Controller('/content')
@@ -11,6 +16,7 @@ export class ContentController {
   constructor(
     private readonly contentService: ContentService,
     private readonly userContentService: UserContentService,
+    private readonly competitorContentService: CompetitorContentService,
   ) {}
 
   /**
@@ -54,13 +60,25 @@ export class ContentController {
   }
 
   /**
-   * GET /api/content/competitor/{username} ⚡ NEW
-   * Description: Fetches content from a competitor's profile.
-   * Usage: Used in the competitor analysis feature to compare content strategies.
+   * GET /api/content/competitor/{username} ⚡
+   * Comprehensive Competitor Content Retrieval with Advanced Analytics and Performance Optimization
+   *
+   * Description: Fetches content from a competitor's profile for competitive analysis. This endpoint
+   * is a key part of the competitor analysis feature, allowing users to retrieve and analyze competitor
+   * content strategies, identify trends, and understand what performs well in their niche.
+   * Usage: Competitor analysis, content strategy comparison, trend identification, and performance benchmarking.
    */
   @Get('/competitor/:username')
-  getCompetitorContent(@Param('username') username: string) {
-    return this.contentService.getCompetitorContent(username);
+  async getCompetitorContent(
+    @Param('username') username: string,
+    @Query() query: GetCompetitorContentQueryDto,
+  ): Promise<GetCompetitorContentResponseDto> {
+    return await this.competitorContentService.getCompetitorContent(
+      username,
+      query.limit,
+      query.offset,
+      query.sort_by,
+    );
   }
 
   /**
