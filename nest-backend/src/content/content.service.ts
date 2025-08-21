@@ -99,41 +99,4 @@ export class ContentService {
       // TODO: Implement actual competitor content fetching logic
     };
   }
-
-  /**
-   * Fetches content from a user's own profile
-   */
-  getUserContent(username: string) {
-    return {
-      message: `Getting user content for ${username}`,
-      username,
-      data: {
-        profile: {
-          username,
-          displayName: '',
-          followerCount: 0,
-          followingCount: 0,
-          postCount: 0,
-        },
-        content: {
-          reels: [],
-          posts: [],
-          stories: [],
-        },
-        analytics: {
-          avgViews: 0,
-          avgLikes: 0,
-          avgComments: 0,
-          engagementRate: 0,
-        },
-        viralPotential: {
-          score: 0,
-          factors: [],
-          recommendations: [],
-        },
-        lastUpdated: new Date().toISOString(),
-      },
-      // TODO: Implement actual user content fetching and analysis logic
-    };
-  }
 }

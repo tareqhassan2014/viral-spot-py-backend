@@ -1,9 +1,17 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ContentService } from './content.service';
+import {
+  GetUserContentQueryDto,
+  GetUserContentResponseDto,
+} from './dto/get-user-content.dto';
+import { UserContentService } from './services/user-content.service';
 
 @Controller('/content')
 export class ContentController {
-  constructor(private readonly contentService: ContentService) {}
+  constructor(
+    private readonly contentService: ContentService,
+    private readonly userContentService: UserContentService,
+  ) {}
 
   /**
    * GET /api/content/reels
@@ -56,12 +64,24 @@ export class ContentController {
   }
 
   /**
-   * GET /api/content/user/{username} ⚡ NEW
-   * Description: Fetches content from a user's own profile.
-   * Usage: Allows users to analyze their own content through the ViralSpot pipeline.
+   * GET /api/content/user/{username} ⚡
+   * Comprehensive User Content Retrieval with Advanced Analytics and Frontend Optimization
+   *
+   * Description: Fetches content from a user's own profile through the ViralSpot analysis pipeline
+   * and interface. Supports pagination and sorting to make it easy for users to browse their own
+   * content library and analyze their content strategy, performance, and viral potential.
+   * Usage: Self-analysis, content strategy optimization, performance tracking, and content library browsing.
    */
   @Get('/user/:username')
-  getUserContent(@Param('username') username: string) {
-    return this.contentService.getUserContent(username);
+  async getUserContent(
+    @Param('username') username: string,
+    @Query() query: GetUserContentQueryDto,
+  ): Promise<GetUserContentResponseDto> {
+    return await this.userContentService.getUserContent(
+      username,
+      query.limit,
+      query.offset,
+      query.sort_by,
+    );
   }
 }
