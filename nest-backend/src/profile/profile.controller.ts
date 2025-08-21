@@ -1,10 +1,15 @@
-import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { CacheClearingResponseDto } from './dto/cache-clearing-response.dto';
 import { CompetitorAdditionResponseDto } from './dto/competitor-response.dto';
+import {
+  GetProfileReelsQueryDto,
+  GetProfileReelsResponseDto,
+} from './dto/profile-reels.dto';
 import { GetProfileResponseDto } from './dto/profile-response.dto';
 import { ProfileStatusResponseDto } from './dto/profile-status-response.dto';
 import { ProfileService } from './profile.service';
 import { CompetitorService } from './services/competitor.service';
+import { ProfileReelsService } from './services/profile-reels.service';
 import { ProfileRetrievalService } from './services/profile-retrieval.service';
 import { ProfileStatusService } from './services/profile-status.service';
 import { SimilarProfilesCacheService } from './services/similar-profiles-cache.service';
@@ -15,6 +20,7 @@ export class ProfileController {
     private readonly profileService: ProfileService,
     private readonly competitorService: CompetitorService,
     private readonly profileRetrievalService: ProfileRetrievalService,
+    private readonly profileReelsService: ProfileReelsService,
     private readonly profileStatusService: ProfileStatusService,
     private readonly cacheService: SimilarProfilesCacheService,
   ) {}
@@ -36,13 +42,25 @@ export class ProfileController {
   }
 
   /**
-   * GET /api/profile/{username}/reels
-   * Description: Fetches all the reels associated with a specific profile.
-   * Usage: Populates the reels section of a profile's page.
+   * GET /api/profile/{username}/reels 🎬
+   * Advanced Profile Reels Retrieval with Intelligent Sorting and Pagination
+   *
+   * Description: Fetches all reels associated with a specific profile with comprehensive
+   * sorting options, pagination support, and complete profile data integration. Supports
+   * popular, recent, and oldest sorting with efficient MongoDB aggregation pipeline.
+   * Usage: Profile reels display, content browsing, timeline navigation, and viral content discovery.
    */
   @Get('/:username/reels')
-  getProfileReels(@Param('username') username: string) {
-    return this.profileService.getProfileReels(username);
+  async getProfileReels(
+    @Param('username') username: string,
+    @Query() query: GetProfileReelsQueryDto,
+  ): Promise<GetProfileReelsResponseDto> {
+    return await this.profileReelsService.getProfileReels(
+      username,
+      query.sort_by,
+      query.limit,
+      query.offset,
+    );
   }
 
   /**

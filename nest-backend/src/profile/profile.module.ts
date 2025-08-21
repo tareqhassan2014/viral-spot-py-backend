@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Content, ContentSchema } from '../content/schemas/content.schema';
 import { ProfileController } from './profile.controller';
 import { ProfileService } from './profile.service';
 import {
@@ -16,6 +17,7 @@ import {
   SimilarProfileSchema,
 } from './schemas/similar-profile.schema';
 import { CompetitorService } from './services/competitor.service';
+import { ProfileReelsService } from './services/profile-reels.service';
 import { ProfileRetrievalService } from './services/profile-retrieval.service';
 import { ProfileStatusService } from './services/profile-status.service';
 import { SimilarProfilesCacheService } from './services/similar-profiles-cache.service';
@@ -27,6 +29,7 @@ import { SimilarProfilesCacheService } from './services/similar-profiles-cache.s
       { name: SecondaryProfile.name, schema: SecondaryProfileSchema },
       { name: SimilarProfile.name, schema: SimilarProfileSchema },
       { name: Queue.name, schema: QueueSchema },
+      { name: Content.name, schema: ContentSchema },
     ]),
   ],
   controllers: [ProfileController],
@@ -34,6 +37,7 @@ import { SimilarProfilesCacheService } from './services/similar-profiles-cache.s
     ProfileService,
     CompetitorService,
     ProfileRetrievalService,
+    ProfileReelsService,
     ProfileStatusService,
     SimilarProfilesCacheService,
   ],
@@ -41,6 +45,7 @@ import { SimilarProfilesCacheService } from './services/similar-profiles-cache.s
     ProfileService,
     CompetitorService,
     ProfileRetrievalService,
+    ProfileReelsService,
     ProfileStatusService,
     SimilarProfilesCacheService,
   ],
