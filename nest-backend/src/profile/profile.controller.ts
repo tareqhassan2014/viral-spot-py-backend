@@ -5,6 +5,10 @@ import {
   GetProfileReelsQueryDto,
   GetProfileReelsResponseDto,
 } from './dto/profile-reels.dto';
+import {
+  ProfileRequestQueryDto,
+  RequestProfileProcessingResponseDto,
+} from './dto/profile-request.dto';
 import { GetProfileResponseDto } from './dto/profile-response.dto';
 import { ProfileStatusResponseDto } from './dto/profile-status-response.dto';
 import { GetSecondaryProfileResponseDto } from './dto/secondary-profile.dto';
@@ -19,6 +23,7 @@ import {
 import { ProfileService } from './profile.service';
 import { CompetitorService } from './services/competitor.service';
 import { ProfileReelsService } from './services/profile-reels.service';
+import { ProfileRequestService } from './services/profile-request.service';
 import { ProfileRetrievalService } from './services/profile-retrieval.service';
 import { ProfileStatusService } from './services/profile-status.service';
 import { SecondaryProfileService } from './services/secondary-profile.service';
@@ -38,6 +43,7 @@ export class ProfileController {
     private readonly profileStatusService: ProfileStatusService,
     private readonly cacheService: SimilarProfilesCacheService,
     private readonly secondaryProfileService: SecondaryProfileService,
+    private readonly profileRequestService: ProfileRequestService,
   ) {}
 
   /**
@@ -168,13 +174,23 @@ export class ProfileController {
   }
 
   /**
-   * POST /api/profile/{username}/request
-   * Description: Submits a request to scrape and analyze a new profile.
-   * Usage: The primary way for users to add new profiles to the system.
+   * POST /api/profile/{username}/request ⚡
+   * Intelligent Profile Processing Requests with Comprehensive Duplicate Prevention
+   *
+   * Description: Serves as the primary entry point for profile data acquisition in the ViralSpot system,
+   * enabling users to request comprehensive Instagram profile analysis with intelligent duplicate prevention,
+   * priority queue management, and advanced state tracking.
+   * Usage: User profile requests, competitor analysis, profile discovery, profile upgrades, administrative processing.
    */
   @Post('/:username/request')
-  requestProfileProcessing(@Param('username') username: string) {
-    return this.profileService.requestProfileProcessing(username);
+  async requestProfileProcessing(
+    @Param('username') username: string,
+    @Query() query: ProfileRequestQueryDto,
+  ): Promise<RequestProfileProcessingResponseDto> {
+    return await this.profileRequestService.requestProfileProcessing(
+      username,
+      query.source,
+    );
   }
 
   /**

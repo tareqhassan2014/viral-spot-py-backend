@@ -66,17 +66,4 @@ export class ProfileService {
       // TODO: Implement fast similar profiles with caching
     };
   }
-
-  /**
-   * Submits a request to scrape and analyze a new profile
-   */
-  requestProfileProcessing(username: string) {
-    return {
-      message: `Requesting profile processing for ${username}`,
-      username,
-      requestId: `req_${Date.now()}`,
-      status: 'queued',
-      // TODO: Implement actual profile processing request
-    };
-  }
 }

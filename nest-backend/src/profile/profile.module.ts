@@ -18,6 +18,7 @@ import {
 } from './schemas/similar-profile.schema';
 import { CompetitorService } from './services/competitor.service';
 import { ProfileReelsService } from './services/profile-reels.service';
+import { ProfileRequestService } from './services/profile-request.service';
 import { ProfileRetrievalService } from './services/profile-retrieval.service';
 import { ProfileStatusService } from './services/profile-status.service';
 import { SecondaryProfileService } from './services/secondary-profile.service';
@@ -46,6 +47,7 @@ import { SimilarProfilesService } from './services/similar-profiles.service';
     ProfileStatusService,
     SimilarProfilesCacheService,
     SecondaryProfileService,
+    ProfileRequestService,
   ],
   exports: [
     ProfileService,
@@ -57,6 +59,7 @@ import { SimilarProfilesService } from './services/similar-profiles.service';
     ProfileStatusService,
     SimilarProfilesCacheService,
     SecondaryProfileService,
+    ProfileRequestService,
   ],
 })
 export class ProfileModule {}
