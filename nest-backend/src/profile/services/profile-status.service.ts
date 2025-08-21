@@ -33,39 +33,31 @@ export class ProfileStatusService {
     username: string,
   ): Promise<ProfileStatusResponseDto> {
     try {
-      // Input validation and sanitization
-      const validationResult = this.validateAndSanitizeUsername(username);
-      if (!validationResult.isValid) {
-        return validationResult.errorResponse;
-      }
-
-      const cleanUsername = validationResult.cleanUsername;
-      this.logger.log(`🔍 Checking profile status: ${cleanUsername}`);
+      this.logger.log(`🔍 Checking profile status: ${username}`);
 
       // Step 1: Check if profile exists in primary_profiles (processing complete)
       const primaryProfile = await this.primaryProfileModel
-        .findOne({ username: cleanUsername })
+        .findOne({
+          username,
+        })
         .exec();
 
       if (primaryProfile) {
-        return this.buildCompletedProfileResponse(
-          primaryProfile,
-          cleanUsername,
-        );
+        return this.buildCompletedProfileResponse(primaryProfile, username);
       }
 
       // Step 2: Check queue status for comprehensive tracking
       const queueItem = await this.queueModel
-        .findOne({ username: cleanUsername })
+        .findOne({ username })
         .sort({ timestamp: -1 }) // Get most recent entry
         .exec();
 
       if (queueItem) {
-        return await this.buildQueueStatusResponse(queueItem, cleanUsername);
+        return await this.buildQueueStatusResponse(queueItem, username);
       }
 
       // Step 3: Profile not found in either system
-      return this.buildNotFoundResponse(cleanUsername);
+      return this.buildNotFoundResponse(username);
     } catch (error) {
       return this.buildErrorResponse(error, username);
     }
@@ -485,98 +477,5 @@ export class ProfileStatusService {
         recommended_action: 'retry_status_check',
       };
     }
-  }
-
-  /**
-   * Validate and sanitize username input
-   */
-  private validateAndSanitizeUsername(
-    username: string,
-  ):
-    | { isValid: true; cleanUsername: string }
-    | { isValid: false; errorResponse: ProfileStatusResponseDto } {
-    // Input sanitization
-    const cleanUsername = username.toLowerCase().replace(/^@/, '').trim();
-
-    // Validation: Empty username
-    if (!cleanUsername || cleanUsername.length === 0) {
-      return {
-        isValid: false,
-        errorResponse: {
-          success: false,
-          data: {
-            completed: false,
-            status: 'ERROR',
-            message: 'Username is required',
-            error_handling: {
-              error_type: 'validation_error',
-              retry_recommended: false,
-            },
-            user_experience: {
-              recommended_polling_interval: 'stop',
-              can_be_cancelled: false,
-              next_action: 'provide_valid_username',
-            },
-            timestamp: new Date().toISOString(),
-          },
-        },
-      };
-    }
-
-    // Validation: Username too long
-    if (cleanUsername.length > 30) {
-      return {
-        isValid: false,
-        errorResponse: {
-          success: false,
-          data: {
-            completed: false,
-            status: 'ERROR',
-            message: 'Username too long (max 30 characters)',
-            error_handling: {
-              error_type: 'validation_error',
-              retry_recommended: false,
-            },
-            user_experience: {
-              recommended_polling_interval: 'stop',
-              can_be_cancelled: false,
-              next_action: 'provide_valid_username',
-            },
-            timestamp: new Date().toISOString(),
-          },
-        },
-      };
-    }
-
-    // Validation: Invalid characters
-    const usernameRegex = /^[a-zA-Z0-9._-]+$/;
-    if (!usernameRegex.test(cleanUsername)) {
-      return {
-        isValid: false,
-        errorResponse: {
-          success: false,
-          data: {
-            completed: false,
-            status: 'ERROR',
-            message: 'Username contains invalid characters',
-            error_handling: {
-              error_type: 'validation_error',
-              retry_recommended: false,
-            },
-            user_experience: {
-              recommended_polling_interval: 'stop',
-              can_be_cancelled: false,
-              next_action: 'provide_valid_username',
-            },
-            timestamp: new Date().toISOString(),
-          },
-        },
-      };
-    }
-
-    return {
-      isValid: true,
-      cleanUsername,
-    };
   }
 }

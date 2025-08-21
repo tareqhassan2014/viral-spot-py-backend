@@ -1,9 +1,11 @@
 import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { CacheClearingResponseDto } from './dto/cache-clearing-response.dto';
 import { CompetitorAdditionResponseDto } from './dto/competitor-response.dto';
 import { ProfileStatusResponseDto } from './dto/profile-status-response.dto';
 import { ProfileService } from './profile.service';
 import { CompetitorService } from './services/competitor.service';
 import { ProfileStatusService } from './services/profile-status.service';
+import { SimilarProfilesCacheService } from './services/similar-profiles-cache.service';
 
 @Controller('/profile')
 export class ProfileController {
@@ -11,6 +13,7 @@ export class ProfileController {
     private readonly profileService: ProfileService,
     private readonly competitorService: CompetitorService,
     private readonly profileStatusService: ProfileStatusService,
+    private readonly cacheService: SimilarProfilesCacheService,
   ) {}
 
   /**
@@ -54,13 +57,19 @@ export class ProfileController {
   }
 
   /**
-   * DELETE /api/profile/{username}/similar-cache ⚡ NEW
-   * Description: Clears cached similar profiles data for a specific username with advanced cache management.
-   * Usage: Cache management, data refresh, and performance optimization for similar profiles system.
+   * DELETE /api/profile/{username}/similar-cache ⚡
+   * Advanced Cache Management for Similar Profiles with Performance Optimization
+   *
+   * Description: Provides comprehensive cache management capabilities for similar profiles data
+   * with intelligent performance optimization. Serves as a critical cache invalidation tool that
+   * enables real-time cache refresh for similar profiles optimization.
+   * Usage: Cache refresh, administrative management, development testing, and data consistency.
    */
   @Delete('/:username/similar-cache')
-  clearSimilarProfilesCache(@Param('username') username: string) {
-    return this.profileService.clearSimilarProfilesCache(username);
+  async clearSimilarProfilesCache(
+    @Param('username') username: string,
+  ): Promise<CacheClearingResponseDto> {
+    return this.cacheService.clearCacheForProfile(username);
   }
 
   /**

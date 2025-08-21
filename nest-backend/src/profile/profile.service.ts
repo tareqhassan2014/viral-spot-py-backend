@@ -78,18 +78,6 @@ export class ProfileService {
   }
 
   /**
-   * Clears cached similar profiles data for a specific username
-   */
-  clearSimilarProfilesCache(username: string) {
-    return {
-      message: `Clearing similar profiles cache for ${username}`,
-      username,
-      success: true,
-      // TODO: Implement cache clearing logic
-    };
-  }
-
-  /**
    * Retrieves secondary (discovered) profiles associated with a primary profile
    */
   getSecondaryProfiles(username: string) {

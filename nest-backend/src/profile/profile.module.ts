@@ -17,6 +17,7 @@ import {
 } from './schemas/similar-profile.schema';
 import { CompetitorService } from './services/competitor.service';
 import { ProfileStatusService } from './services/profile-status.service';
+import { SimilarProfilesCacheService } from './services/similar-profiles-cache.service';
 
 @Module({
   imports: [
@@ -28,7 +29,17 @@ import { ProfileStatusService } from './services/profile-status.service';
     ]),
   ],
   controllers: [ProfileController],
-  providers: [ProfileService, CompetitorService, ProfileStatusService],
-  exports: [ProfileService, CompetitorService, ProfileStatusService],
+  providers: [
+    ProfileService,
+    CompetitorService,
+    ProfileStatusService,
+    SimilarProfilesCacheService,
+  ],
+  exports: [
+    ProfileService,
+    CompetitorService,
+    ProfileStatusService,
+    SimilarProfilesCacheService,
+  ],
 })
 export class ProfileModule {}

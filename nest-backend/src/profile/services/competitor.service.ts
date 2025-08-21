@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
@@ -27,95 +27,45 @@ export class CompetitorService {
     primaryUsername: string,
     targetUsername: string,
   ): Promise<CompetitorAdditionResponseDto> {
-    try {
-      // Input validation and sanitization
-      const sanitizedPrimary = this.sanitizeUsername(primaryUsername);
-      const sanitizedTarget = this.sanitizeUsername(targetUsername);
+    this.logger.log(
+      `📝 Manual competitor addition: @${primaryUsername} adding @${targetUsername}`,
+    );
 
-      // Validate input parameters
-      this.validateInputs(sanitizedPrimary, sanitizedTarget);
+    const startTime = Date.now();
 
-      this.logger.log(
-        `📝 Manual competitor addition: @${sanitizedPrimary} adding @${sanitizedTarget}`,
-      );
+    // Check for existing competitor relationship (duplicate prevention)
+    const existingCompetitor = await this.findExistingCompetitor(
+      primaryUsername,
+      targetUsername,
+    );
 
-      const startTime = Date.now();
-
-      // Check for existing competitor relationship (duplicate prevention)
-      const existingCompetitor = await this.findExistingCompetitor(
-        sanitizedPrimary,
-        sanitizedTarget,
-      );
-
-      if (existingCompetitor) {
-        return this.buildCachedCompetitorResponse(
-          existingCompetitor,
-          sanitizedPrimary,
-          sanitizedTarget,
-          startTime,
-        );
-      }
-
-      // Create new competitor
-      const newCompetitor = await this.createNewCompetitor(
-        sanitizedPrimary,
-        sanitizedTarget,
-      );
-
-      const processingTime = Date.now() - startTime;
-
-      this.logger.log(
-        `✅ Successfully added @${sanitizedTarget} as competitor for @${sanitizedPrimary} (${processingTime}ms)`,
-      );
-
-      return this.buildNewCompetitorResponse(
-        newCompetitor,
-        sanitizedPrimary,
-        sanitizedTarget,
-        processingTime,
-      );
-    } catch (error) {
-      return this.handleError(error, primaryUsername, targetUsername);
-    }
-  }
-
-  private sanitizeUsername(username: string): string {
-    return username.toLowerCase().replace(/^@/, '').trim();
-  }
-
-  private validateInputs(
-    primaryUsername: string,
-    targetUsername: string,
-  ): void {
-    if (!primaryUsername || !targetUsername) {
-      throw new HttpException(
-        'Both primary_username and target_username are required',
-        HttpStatus.BAD_REQUEST,
+    if (existingCompetitor) {
+      return this.buildCachedCompetitorResponse(
+        existingCompetitor,
+        primaryUsername,
+        targetUsername,
+        startTime,
       );
     }
 
-    if (primaryUsername === targetUsername) {
-      throw new HttpException(
-        'Cannot add self as competitor',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    // Create new competitor
+    const newCompetitor = await this.createNewCompetitor(
+      primaryUsername,
+      targetUsername,
+    );
 
-    // Username format validation
-    const usernameRegex = /^[a-zA-Z0-9._-]+$/;
-    if (!usernameRegex.test(primaryUsername)) {
-      throw new HttpException(
-        'Primary username contains invalid characters',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const processingTime = Date.now() - startTime;
 
-    if (!usernameRegex.test(targetUsername)) {
-      throw new HttpException(
-        'Target username contains invalid characters',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    this.logger.log(
+      `✅ Successfully added @${targetUsername} as competitor for @${primaryUsername} (${processingTime}ms)`,
+    );
+
+    return this.buildNewCompetitorResponse(
+      newCompetitor,
+      primaryUsername,
+      targetUsername,
+      processingTime,
+    );
   }
 
   private async findExistingCompetitor(
@@ -254,55 +204,6 @@ export class CompetitorService {
       },
       message: `Successfully added @${targetUsername} as competitor`,
     };
-  }
-
-  private handleError(
-    error: unknown,
-    primaryUsername: string,
-    targetUsername: string,
-  ): never {
-    if (error instanceof HttpException) {
-      throw error;
-    }
-
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
-
-    this.logger.error(
-      `❌ Error adding manual competitor @${targetUsername} for @${primaryUsername}: ${errorMessage}`,
-    );
-
-    // Handle specific error types
-    if (errorMessage.includes('not found')) {
-      throw new HttpException(
-        `Profile @${targetUsername} not found on Instagram`,
-        HttpStatus.NOT_FOUND,
-      );
-    } else if (
-      errorMessage.includes('api') ||
-      errorMessage.includes('external')
-    ) {
-      throw new HttpException(
-        'External Instagram API temporarily unavailable',
-        HttpStatus.BAD_GATEWAY,
-      );
-    } else if (
-      error &&
-      typeof error === 'object' &&
-      'code' in error &&
-      error.code === 11000
-    ) {
-      // MongoDB duplicate key error
-      throw new HttpException(
-        'Competitor relationship already exists',
-        HttpStatus.CONFLICT,
-      );
-    }
-
-    throw new HttpException(
-      'Internal server error occurred while adding competitor',
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
   }
 
   /**
