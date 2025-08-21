@@ -102,19 +102,6 @@ export class ProfileService {
   }
 
   /**
-   * Checks the processing status of a profile
-   */
-  getProfileStatus(username: string) {
-    return {
-      message: `Getting processing status for ${username}`,
-      username,
-      status: 'pending', // pending, processing, completed, error
-      progress: 0,
-      // TODO: Implement actual status checking
-    };
-  }
-
-  /**
    * Submits a request to scrape and analyze a new profile
    */
   requestProfileProcessing(username: string) {

@@ -1,7 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 
-export type PrimaryProfileDocument = PrimaryProfile & Document;
+export type PrimaryProfileDocument = PrimaryProfile &
+  Document & {
+    createdAt: Date;
+    updatedAt: Date;
+  };
 
 @Schema({ timestamps: true, collection: 'primary_profiles' })
 export class PrimaryProfile {

@@ -1,13 +1,16 @@
 import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { CompetitorAdditionResponseDto } from './dto/competitor-response.dto';
+import { ProfileStatusResponseDto } from './dto/profile-status-response.dto';
 import { ProfileService } from './profile.service';
 import { CompetitorService } from './services/competitor.service';
+import { ProfileStatusService } from './services/profile-status.service';
 
 @Controller('/profile')
 export class ProfileController {
   constructor(
     private readonly profileService: ProfileService,
     private readonly competitorService: CompetitorService,
+    private readonly profileStatusService: ProfileStatusService,
   ) {}
 
   /**
@@ -71,13 +74,19 @@ export class ProfileController {
   }
 
   /**
-   * GET /api/profile/{username}/status
-   * Description: Checks the processing status of a profile.
-   * Usage: Allows the frontend to poll for updates after requesting a profile to be processed.
+   * GET /api/profile/{username}/status 🔍
+   * Comprehensive Real-time Profile Processing Status Tracking
+   *
+   * Description: Provides comprehensive real-time profile processing status tracking with advanced
+   * state monitoring and intelligent polling optimization. Serves as the primary status monitoring
+   * interface for profile processing workflows.
+   * Usage: Real-time status updates, progress monitoring, queue management, and error detection.
    */
   @Get('/:username/status')
-  getProfileStatus(@Param('username') username: string) {
-    return this.profileService.getProfileStatus(username);
+  async checkProfileStatus(
+    @Param('username') username: string,
+  ): Promise<ProfileStatusResponseDto> {
+    return this.profileStatusService.checkProfileStatus(username);
   }
 
   /**

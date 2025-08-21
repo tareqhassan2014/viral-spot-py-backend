@@ -1,7 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type QueueDocument = Queue & Document;
+export type QueueDocument = Queue &
+  Document & {
+    createdAt: Date;
+    updatedAt: Date;
+  };
 
 @Schema({ timestamps: true, collection: 'queue' })
 export class Queue {
@@ -13,7 +17,7 @@ export class Queue {
 
   @Prop({
     type: String,
-    enum: ['HIGH', 'LOW'],
+    enum: ['HIGH', 'MEDIUM', 'LOW'],
     default: 'LOW',
     index: true,
   })
