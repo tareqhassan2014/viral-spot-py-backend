@@ -1,7 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type SimilarProfileDocument = SimilarProfile & Document;
+export type SimilarProfileDocument = SimilarProfile &
+  Document & {
+    createdAt: Date;
+    updatedAt: Date;
+  };
 
 @Schema({ timestamps: true, collection: 'similar_profiles' })
 export class SimilarProfile {

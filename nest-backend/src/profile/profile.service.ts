@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -17,6 +17,8 @@ import {
 
 @Injectable()
 export class ProfileService {
+  private readonly logger = new Logger(ProfileService.name);
+
   constructor(
     @InjectModel(PrimaryProfile.name)
     private primaryProfileModel: Model<PrimaryProfileDocument>,
@@ -122,19 +124,6 @@ export class ProfileService {
       requestId: `req_${Date.now()}`,
       status: 'queued',
       // TODO: Implement actual profile processing request
-    };
-  }
-
-  /**
-   * Adds a target_username as a competitor to a primary_username
-   */
-  addCompetitor(primaryUsername: string, targetUsername: string) {
-    return {
-      message: `Adding ${targetUsername} as competitor to ${primaryUsername}`,
-      primaryUsername,
-      targetUsername,
-      success: true,
-      // TODO: Implement actual competitor addition logic
     };
   }
 }

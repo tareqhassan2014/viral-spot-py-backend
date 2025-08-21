@@ -1,9 +1,14 @@
 import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { CompetitorAdditionResponseDto } from './dto/competitor-response.dto';
 import { ProfileService } from './profile.service';
+import { CompetitorService } from './services/competitor.service';
 
 @Controller('/profile')
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) {}
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly competitorService: CompetitorService,
+  ) {}
 
   /**
    * GET /api/profile/{username}
@@ -86,15 +91,21 @@ export class ProfileController {
   }
 
   /**
-   * POST /api/profile/{primary_username}/add-competitor/{target_username} ⚡ NEW
-   * Description: Adds a target_username as a competitor to a primary_username.
-   * Usage: Part of a new competitor analysis feature.
+   * POST /api/profile/{primary_username}/add-competitor/{target_username} ⚡
+   * Manual Competitor Addition with Intelligent Profile Processing and Storage Management
+   *
+   * Description: Adds a target_username as a competitor to a primary_username with comprehensive
+   * profile data fetching, duplicate prevention, and intelligent fallback handling.
+   * Usage: Strategic competitor tracking, custom competitor lists, and competitive intelligence.
    */
   @Post('/:primary_username/add-competitor/:target_username')
-  addCompetitor(
+  async addManualCompetitor(
     @Param('primary_username') primaryUsername: string,
     @Param('target_username') targetUsername: string,
-  ) {
-    return this.profileService.addCompetitor(primaryUsername, targetUsername);
+  ): Promise<CompetitorAdditionResponseDto> {
+    return this.competitorService.addManualCompetitor(
+      primaryUsername,
+      targetUsername,
+    );
   }
 }
