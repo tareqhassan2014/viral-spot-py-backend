@@ -29,16 +29,6 @@ export class ProfileService {
     @InjectModel(Queue.name)
     private queueModel: Model<QueueDocument>,
   ) {}
-  /**
-   * Retrieves detailed data for a specific profile
-   */
-  getProfile(username: string) {
-    return {
-      message: `Getting profile details for ${username}`,
-      username,
-      // TODO: Implement actual profile retrieval logic
-    };
-  }
 
   /**
    * Fetches all the reels associated with a specific profile

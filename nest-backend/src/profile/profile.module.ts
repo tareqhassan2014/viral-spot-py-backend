@@ -16,6 +16,7 @@ import {
   SimilarProfileSchema,
 } from './schemas/similar-profile.schema';
 import { CompetitorService } from './services/competitor.service';
+import { ProfileRetrievalService } from './services/profile-retrieval.service';
 import { ProfileStatusService } from './services/profile-status.service';
 import { SimilarProfilesCacheService } from './services/similar-profiles-cache.service';
 
@@ -32,12 +33,14 @@ import { SimilarProfilesCacheService } from './services/similar-profiles-cache.s
   providers: [
     ProfileService,
     CompetitorService,
+    ProfileRetrievalService,
     ProfileStatusService,
     SimilarProfilesCacheService,
   ],
   exports: [
     ProfileService,
     CompetitorService,
+    ProfileRetrievalService,
     ProfileStatusService,
     SimilarProfilesCacheService,
   ],

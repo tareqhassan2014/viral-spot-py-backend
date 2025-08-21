@@ -1,9 +1,11 @@
 import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { CacheClearingResponseDto } from './dto/cache-clearing-response.dto';
 import { CompetitorAdditionResponseDto } from './dto/competitor-response.dto';
+import { GetProfileResponseDto } from './dto/profile-response.dto';
 import { ProfileStatusResponseDto } from './dto/profile-status-response.dto';
 import { ProfileService } from './profile.service';
 import { CompetitorService } from './services/competitor.service';
+import { ProfileRetrievalService } from './services/profile-retrieval.service';
 import { ProfileStatusService } from './services/profile-status.service';
 import { SimilarProfilesCacheService } from './services/similar-profiles-cache.service';
 
@@ -12,18 +14,25 @@ export class ProfileController {
   constructor(
     private readonly profileService: ProfileService,
     private readonly competitorService: CompetitorService,
+    private readonly profileRetrievalService: ProfileRetrievalService,
     private readonly profileStatusService: ProfileStatusService,
     private readonly cacheService: SimilarProfilesCacheService,
   ) {}
 
   /**
-   * GET /api/profile/{username}
-   * Description: Retrieves detailed data for a specific profile.
-   * Usage: Used to display profile pages on the frontend.
+   * GET /api/profile/{username} 🔍
+   * Comprehensive Profile Data Retrieval with Advanced Analytics and Frontend Optimization
+   *
+   * Description: Retrieves detailed profile data for a specific Instagram username with comprehensive
+   * analytics, categorization, and frontend-optimized data transformation. Serves as the primary
+   * profile data endpoint with intelligent CDN image handling and performance optimization.
+   * Usage: Profile page display, analytics dashboard, competitive analysis, and user profile management.
    */
   @Get('/:username')
-  getProfile(@Param('username') username: string) {
-    return this.profileService.getProfile(username);
+  async getProfile(
+    @Param('username') username: string,
+  ): Promise<GetProfileResponseDto> {
+    return await this.profileRetrievalService.getProfile(username);
   }
 
   /**
@@ -121,7 +130,7 @@ export class ProfileController {
     @Param('primary_username') primaryUsername: string,
     @Param('target_username') targetUsername: string,
   ): Promise<CompetitorAdditionResponseDto> {
-    return this.competitorService.addManualCompetitor(
+    return await this.competitorService.addManualCompetitor(
       primaryUsername,
       targetUsername,
     );

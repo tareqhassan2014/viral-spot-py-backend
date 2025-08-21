@@ -23,7 +23,22 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+ViralSpot Backend - A NestJS application for managing Instagram profile data, viral content analysis, and competitor tracking.
+
+## Environment Configuration
+
+Create a `.env` file in the root directory with the following variables:
+
+```bash
+# Database Configuration
+MONGODB_URI=mongodb://localhost:27017/viralspot
+
+# CDN Configuration (optional)
+CDN_BASE_URL=https://your-cdn-domain.com
+
+# Application Configuration
+PORT=3000
+```
 
 ## Project setup
 
@@ -56,6 +71,44 @@ $ pnpm run test:e2e
 # test coverage
 $ pnpm run test:cov
 ```
+
+## API Endpoints
+
+### Profile Management
+
+#### GET `/api/profile/{username}`
+Retrieves detailed data for a specific Instagram profile.
+
+**Parameters:**
+- `username` (string): Instagram username (letters, numbers, dots, and underscores only)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "username": "exampleuser",
+    "profile_name": "Example User",
+    "bio": "This is an example bio about content creation and lifestyle.",
+    "followers": 125430,
+    "profile_image_url": "https://cdn.example.com/profile-images/exampleuser_profile.jpg",
+    "is_verified": true,
+    "is_business_account": false,
+    "reels_count": 247,
+    "average_views": 45230.75,
+    "primary_category": "Lifestyle",
+    "profile_type": "primary",
+    "url": "https://www.instagram.com/exampleuser/",
+    "similar_accounts": ["similar_creator1", "similar_creator2"],
+    "created_at": "2023-08-20T14:22:00Z",
+    "updated_at": "2024-01-15T11:45:00Z"
+  }
+}
+```
+
+**Error Responses:**
+- `404 Not Found`: Profile not found
+- `400 Bad Request`: Invalid username format
 
 ## Deployment
 
