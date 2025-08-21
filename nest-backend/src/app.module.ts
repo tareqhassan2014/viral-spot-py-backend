@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ContentModule } from './content/content.module';
 import { ProfileModule } from './profile/profile.module';
 import { ViralModule } from './viral/viral.module';
 
@@ -12,6 +13,7 @@ import { ViralModule } from './viral/viral.module';
     }),
     ProfileModule,
     ViralModule,
+    ContentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

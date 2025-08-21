@@ -16,21 +16,21 @@ export class ViralAnalysisReels {
   })
   analysis_id: MongooseSchema.Types.ObjectId;
 
-  @Prop({ type: String, required: true, index: true })
+  @Prop({ type: String, required: true, maxlength: 255 })
   content_id: string;
 
   @Prop({
     type: String,
     enum: ['primary', 'competitor'],
     required: true,
-    index: true,
+    maxlength: 20,
   })
   reel_type: string;
 
-  @Prop({ type: String, required: true, index: true })
+  @Prop({ type: String, required: true, maxlength: 255 })
   username: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100, default: null })
   selection_reason: string;
 
   @Prop({ type: Number, default: 0, min: 0 })
@@ -51,17 +51,17 @@ export class ViralAnalysisReels {
   @Prop({ type: Boolean, default: false })
   transcript_requested: boolean;
 
-  @Prop({ type: Boolean, default: false, index: true })
+  @Prop({ type: Boolean, default: false })
   transcript_completed: boolean;
 
-  @Prop(String)
+  @Prop({ type: String, default: null })
   transcript_error: string;
 
-  @Prop(String)
+  @Prop({ type: String, default: null })
   hook_text: string;
 
-  @Prop({ type: [String], default: [] })
-  power_words: string[];
+  @Prop({ type: MongooseSchema.Types.Mixed, default: null })
+  power_words: any; // JSONB equivalent
 
   @Prop({ type: MongooseSchema.Types.Mixed, default: {} })
   analysis_metadata: Record<string, any>;
@@ -76,17 +76,24 @@ export class ViralAnalysisReels {
 export const ViralAnalysisReelsSchema =
   SchemaFactory.createForClass(ViralAnalysisReels);
 
-// Performance indexes
+// Performance indexes (matching actual SQL schema)
 ViralAnalysisReelsSchema.index({
   analysis_id: 1,
   reel_type: 1,
   rank_in_selection: 1,
-});
+}); // idx_viral_analysis_reels_analysis
+
 ViralAnalysisReelsSchema.index(
   { analysis_id: 1, content_id: 1 },
-  { unique: true },
+  { unique: true }, // viral_analysis_reels_unique_per_analysis
 );
+
+// Conditional index equivalent - MongoDB doesn't support WHERE clauses in indexes,
+// but this compound index will be efficient for queries filtering by transcript_completed = true
 ViralAnalysisReelsSchema.index({
   transcript_completed: 1,
   transcript_fetched_at: -1,
-});
+}); // idx_viral_analysis_reels_transcript
+
+// MongoDB equivalent of GIN index for JSONB field
+ViralAnalysisReelsSchema.index({ analysis_metadata: 1 }); // idx_viral_analysis_reels_analysis_metadata_gin

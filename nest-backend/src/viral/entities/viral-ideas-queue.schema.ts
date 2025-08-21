@@ -5,10 +5,10 @@ export type ViralIdeasQueueDocument = ViralIdeasQueue & Document;
 
 @Schema({ timestamps: true, collection: 'viral_ideas_queue' })
 export class ViralIdeasQueue {
-  @Prop({ type: String, required: true, unique: true, index: true })
+  @Prop({ type: String, required: true, unique: true, maxlength: 255 })
   session_id: string;
 
-  @Prop({ type: String, required: true, index: true })
+  @Prop({ type: String, required: true, index: true, maxlength: 255 })
   primary_username: string;
 
   @Prop({
@@ -38,19 +38,20 @@ export class ViralIdeasQueue {
     enum: ['pending', 'processing', 'completed', 'failed', 'paused'],
     default: 'pending',
     index: true,
+    maxlength: 50,
   })
   status: string;
 
-  @Prop({ type: Number, default: 5, min: 1, max: 10 })
+  @Prop({ type: Number, default: 5, min: 1, max: 10, index: true })
   priority: number;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100 })
   current_step: string;
 
   @Prop({ type: Number, default: 0, min: 0, max: 100 })
   progress_percentage: number;
 
-  @Prop(String)
+  @Prop({ type: String })
   error_message: string;
 
   @Prop({ type: Boolean, default: true })
@@ -59,29 +60,29 @@ export class ViralIdeasQueue {
   @Prop({ type: Number, default: 24, min: 1 })
   rerun_frequency_hours: number;
 
-  @Prop(Date)
+  @Prop({ type: Date })
   last_analysis_at: Date;
 
-  @Prop(Date)
+  @Prop({ type: Date })
   next_scheduled_run: Date;
 
   @Prop({ type: Number, default: 0 })
   total_runs: number;
 
-  @Prop({ type: Date, default: Date.now, index: true })
+  @Prop({ type: Date, default: Date.now, index: -1 })
   submitted_at: Date;
 
-  @Prop(Date)
+  @Prop({ type: Date })
   started_processing_at: Date;
 
-  @Prop(Date)
+  @Prop({ type: Date })
   completed_at: Date;
 }
 
 export const ViralIdeasQueueSchema =
   SchemaFactory.createForClass(ViralIdeasQueue);
 
-// Performance indexes
-ViralIdeasQueueSchema.index({ status: 1, priority: 1 });
-ViralIdeasQueueSchema.index({ auto_rerun_enabled: 1, next_scheduled_run: 1 });
-ViralIdeasQueueSchema.index({ primary_username: 1, status: 1 });
+// Performance indexes (matching SQL schema)
+ViralIdeasQueueSchema.index({ status: 1, priority: 1 }); // For queue processing
+ViralIdeasQueueSchema.index({ auto_rerun_enabled: 1, next_scheduled_run: 1 }); // idx_viral_queue_auto_rerun
+ViralIdeasQueueSchema.index({ primary_username: 1, status: 1 }); // For user-specific queries

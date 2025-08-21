@@ -6,13 +6,18 @@ export type SecondaryProfileDocument = SecondaryProfile & Document;
 
 @Schema({ timestamps: true, collection: 'secondary_profiles' })
 export class SecondaryProfile {
-  @Prop({ type: String, required: true, unique: true, index: true })
+  @Prop({
+    type: String,
+    required: true,
+    unique: true,
+    maxlength: 255,
+  })
   username: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 255 })
   full_name: string;
 
-  @Prop(String)
+  @Prop({ type: String })
   biography: string;
 
   @Prop({ type: Number, default: 0, index: true })
@@ -24,10 +29,10 @@ export class SecondaryProfile {
   @Prop({ type: Number, default: 0 })
   media_count: number;
 
-  @Prop(String)
+  @Prop({ type: String })
   profile_pic_url: string;
 
-  @Prop(String)
+  @Prop({ type: String })
   profile_pic_path: string;
 
   @Prop({ type: Boolean, default: false })
@@ -36,19 +41,19 @@ export class SecondaryProfile {
   @Prop({ type: Boolean, default: false })
   is_private: boolean;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 255 })
   business_email: string;
 
-  @Prop(String)
+  @Prop({ type: String })
   external_url: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100 })
   category: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 255 })
   pk: string;
 
-  @Prop(String)
+  @Prop({ type: String })
   social_context: string;
 
   @Prop({
@@ -58,13 +63,13 @@ export class SecondaryProfile {
   })
   estimated_account_type: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100 })
   primary_category: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100 })
   secondary_category: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100 })
   tertiary_category: string;
 
   @Prop({ type: MongooseSchema.Types.Decimal128, default: 0.5 })
@@ -73,7 +78,7 @@ export class SecondaryProfile {
   @Prop({ type: MongooseSchema.Types.Decimal128, default: 0.5 })
   account_type_confidence: number;
 
-  @Prop({ type: String, default: 'en' })
+  @Prop({ type: String, default: 'en', maxlength: 10 })
   estimated_language: string;
 
   @Prop({ type: Number, default: 0 })
@@ -85,25 +90,25 @@ export class SecondaryProfile {
   @Prop({ type: Boolean, default: false })
   promotion_eligible: boolean;
 
-  @Prop({ type: String, index: true })
+  @Prop({ type: String, index: true, maxlength: 255 })
   discovered_by: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100 })
   discovery_reason: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100 })
   api_source: string;
 
-  @Prop(Number)
+  @Prop({ type: Number })
   similarity_rank: number;
 
-  @Prop(Date)
+  @Prop({ type: Date })
   last_basic_scrape: Date;
 
-  @Prop(Date)
+  @Prop({ type: Date })
   last_full_scrape: Date;
 
-  @Prop(Date)
+  @Prop({ type: Date })
   analysis_timestamp: Date;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'PrimaryProfile' })

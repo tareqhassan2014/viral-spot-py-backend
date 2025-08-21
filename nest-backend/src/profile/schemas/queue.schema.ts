@@ -5,10 +5,10 @@ export type QueueDocument = Queue & Document;
 
 @Schema({ timestamps: true, collection: 'queue' })
 export class Queue {
-  @Prop({ type: String, required: true, index: true })
+  @Prop({ type: String, required: true, index: true, maxlength: 255 })
   username: string;
 
-  @Prop({ type: String, default: 'manual' })
+  @Prop({ type: String, default: 'manual', maxlength: 100 })
   source: string;
 
   @Prop({
@@ -30,14 +30,17 @@ export class Queue {
   @Prop({ type: Number, default: 0 })
   attempts: number;
 
-  @Prop(Date)
+  @Prop({ type: Date })
   last_attempt: Date;
 
-  @Prop(String)
+  @Prop({ type: String })
   error_message: string;
 
-  @Prop({ type: String, unique: true, sparse: true })
+  @Prop({ type: String, unique: true, sparse: true, maxlength: 50 })
   request_id: string;
+
+  @Prop({ type: Date, default: Date.now })
+  timestamp: Date;
 }
 
 export const QueueSchema = SchemaFactory.createForClass(Queue);

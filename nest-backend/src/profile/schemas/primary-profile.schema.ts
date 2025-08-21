@@ -5,13 +5,18 @@ export type PrimaryProfileDocument = PrimaryProfile & Document;
 
 @Schema({ timestamps: true, collection: 'primary_profiles' })
 export class PrimaryProfile {
-  @Prop({ type: String, required: true, unique: true, index: true })
+  @Prop({
+    type: String,
+    required: true,
+    unique: true,
+    maxlength: 255,
+  })
   username: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 255 })
   profile_name: string;
 
-  @Prop(String)
+  @Prop({ type: String })
   bio: string;
 
   @Prop({ type: Number, default: 0, index: true })
@@ -26,16 +31,16 @@ export class PrimaryProfile {
   @Prop({ type: Boolean, default: false })
   is_business_account: boolean;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 500 })
   profile_url: string;
 
-  @Prop(String)
+  @Prop({ type: String })
   profile_image_url: string;
 
-  @Prop(String)
+  @Prop({ type: String })
   profile_image_path: string;
 
-  @Prop(String)
+  @Prop({ type: String })
   hd_profile_image_path: string;
 
   @Prop({
@@ -46,10 +51,10 @@ export class PrimaryProfile {
   })
   account_type: string;
 
-  @Prop({ type: String, default: 'en' })
+  @Prop({ type: String, default: 'en', maxlength: 10 })
   language: string;
 
-  @Prop({ type: String, default: 'entertainment' })
+  @Prop({ type: String, default: 'entertainment', maxlength: 50 })
   content_type: string;
 
   @Prop({ type: Number, default: 0 })
@@ -73,13 +78,13 @@ export class PrimaryProfile {
   @Prop({ type: Number, default: 0 })
   total_comments: number;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100 })
   profile_primary_category: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100 })
   profile_secondary_category: string;
 
-  @Prop(String)
+  @Prop({ type: String, maxlength: 100 })
   profile_tertiary_category: string;
 
   @Prop({ type: MongooseSchema.Types.Decimal128, default: 0.5 })
@@ -88,13 +93,71 @@ export class PrimaryProfile {
   @Prop({ type: MongooseSchema.Types.Decimal128, default: 0.5 })
   account_type_confidence: number;
 
-  @Prop([String])
-  similar_accounts: string[]; // Store similar_account1-20 in an array
+  // Similar accounts - using individual fields to match SQL schema structure
+  @Prop({ type: String, maxlength: 255 })
+  similar_account1: string;
 
-  @Prop(Date)
+  @Prop({ type: String, maxlength: 255 })
+  similar_account2: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account3: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account4: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account5: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account6: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account7: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account8: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account9: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account10: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account11: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account12: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account13: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account14: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account15: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account16: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account17: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account18: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account19: string;
+
+  @Prop({ type: String, maxlength: 255 })
+  similar_account20: string;
+
+  @Prop({ type: Date })
   last_full_scrape: Date;
 
-  @Prop(Date)
+  @Prop({ type: Date })
   analysis_timestamp: Date;
 }
 

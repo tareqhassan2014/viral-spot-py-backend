@@ -20,6 +20,7 @@ export class ViralAnalysisResults {
     type: String,
     enum: ['initial', 'recurring'],
     default: 'initial',
+    maxlength: 50,
   })
   analysis_type: string;
 
@@ -34,6 +35,27 @@ export class ViralAnalysisResults {
 
   @Prop({ type: Number, default: 0 })
   transcripts_fetched: number;
+
+  @Prop({
+    type: String,
+    enum: ['pending', 'transcribing', 'analyzing', 'completed', 'failed'],
+    default: 'pending',
+    index: true,
+    maxlength: 50,
+  })
+  status: string;
+
+  @Prop({ type: String, default: null })
+  error_message: string;
+
+  @Prop({ type: Date, default: Date.now })
+  started_at: Date;
+
+  @Prop({ type: Date, default: null })
+  transcripts_completed_at: Date;
+
+  @Prop({ type: Date, default: null })
+  analysis_completed_at: Date;
 
   @Prop({
     type: MongooseSchema.Types.Mixed,
@@ -60,34 +82,24 @@ export class ViralAnalysisResults {
     analysis_summary?: any;
   };
 
-  @Prop({ type: String, default: 'v2_json' })
+  @Prop({ type: String, default: 'v2_json', maxlength: 50, index: true })
   workflow_version: string;
-
-  @Prop({
-    type: String,
-    enum: ['pending', 'transcribing', 'analyzing', 'completed', 'failed'],
-    default: 'pending',
-    index: true,
-  })
-  status: string;
-
-  @Prop(String)
-  error_message: string;
-
-  @Prop(Date)
-  started_at: Date;
-
-  @Prop(Date)
-  transcripts_completed_at: Date;
-
-  @Prop(Date)
-  analysis_completed_at: Date;
 }
 
 export const ViralAnalysisResultsSchema =
   SchemaFactory.createForClass(ViralAnalysisResults);
 
-// Performance indexes
-ViralAnalysisResultsSchema.index({ queue_id: 1, analysis_run: -1 });
-ViralAnalysisResultsSchema.index({ status: 1, started_at: -1 });
-ViralAnalysisResultsSchema.index({ workflow_version: 1 });
+// Performance indexes (matching actual SQL schema)
+ViralAnalysisResultsSchema.index({ queue_id: 1, analysis_run: -1 }); // idx_viral_analysis_results_queue
+ViralAnalysisResultsSchema.index({ status: 1, started_at: -1 }); // idx_viral_analysis_results_status
+ViralAnalysisResultsSchema.index({ updatedAt: 1 }); // idx_viral_analysis_results_updated_at (timestamps: true creates updatedAt)
+
+// Note: MongoDB doesn't have direct GIN index equivalent, but these compound indexes help with JSONB queries
+ViralAnalysisResultsSchema.index({ 'analysis_data.generated_hooks': 1 }); // Similar to idx_analysis_data_hooks
+ViralAnalysisResultsSchema.index({ 'analysis_data.profile_analysis': 1 }); // Similar to idx_analysis_data_profile
+
+// Unique constraint to match SQL UNIQUE(queue_id, analysis_run)
+ViralAnalysisResultsSchema.index(
+  { queue_id: 1, analysis_run: 1 },
+  { unique: true },
+);
