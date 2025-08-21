@@ -21,6 +21,7 @@ import { ProfileReelsService } from './services/profile-reels.service';
 import { ProfileRetrievalService } from './services/profile-retrieval.service';
 import { ProfileStatusService } from './services/profile-status.service';
 import { SimilarProfilesCacheService } from './services/similar-profiles-cache.service';
+import { SimilarProfilesService } from './services/similar-profiles.service';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { SimilarProfilesCacheService } from './services/similar-profiles-cache.s
     CompetitorService,
     ProfileRetrievalService,
     ProfileReelsService,
+    SimilarProfilesService,
     ProfileStatusService,
     SimilarProfilesCacheService,
   ],
@@ -46,6 +48,7 @@ import { SimilarProfilesCacheService } from './services/similar-profiles-cache.s
     CompetitorService,
     ProfileRetrievalService,
     ProfileReelsService,
+    SimilarProfilesService,
     ProfileStatusService,
     SimilarProfilesCacheService,
   ],

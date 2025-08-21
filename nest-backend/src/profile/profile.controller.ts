@@ -7,12 +7,17 @@ import {
 } from './dto/profile-reels.dto';
 import { GetProfileResponseDto } from './dto/profile-response.dto';
 import { ProfileStatusResponseDto } from './dto/profile-status-response.dto';
+import {
+  GetSimilarProfilesQueryDto,
+  GetSimilarProfilesResponseDto,
+} from './dto/similar-profiles.dto';
 import { ProfileService } from './profile.service';
 import { CompetitorService } from './services/competitor.service';
 import { ProfileReelsService } from './services/profile-reels.service';
 import { ProfileRetrievalService } from './services/profile-retrieval.service';
 import { ProfileStatusService } from './services/profile-status.service';
 import { SimilarProfilesCacheService } from './services/similar-profiles-cache.service';
+import { SimilarProfilesService } from './services/similar-profiles.service';
 
 @Controller('/profile')
 export class ProfileController {
@@ -21,6 +26,7 @@ export class ProfileController {
     private readonly competitorService: CompetitorService,
     private readonly profileRetrievalService: ProfileRetrievalService,
     private readonly profileReelsService: ProfileReelsService,
+    private readonly similarProfilesService: SimilarProfilesService,
     private readonly profileStatusService: ProfileStatusService,
     private readonly cacheService: SimilarProfilesCacheService,
   ) {}
@@ -64,13 +70,23 @@ export class ProfileController {
   }
 
   /**
-   * GET /api/profile/{username}/similar
-   * Description: Gets a list of similar profiles. This is the standard endpoint for similarity checks.
-   * Usage: Suggests other profiles to the user.
+   * GET /api/profile/{username}/similar 🎯
+   * Advanced Similar Profiles Discovery with Intelligent Ranking and Comprehensive Analysis
+   *
+   * Description: Gets a list of similar profiles for a specific user based on sophisticated similarity
+   * ranking algorithms, including comprehensive profile data, multi-level categorization, and detailed
+   * analysis metadata. Provides intelligent profile recommendations for content discovery and competitive analysis.
+   * Usage: Profile recommendations, content discovery, competitive intelligence, and audience expansion.
    */
   @Get('/:username/similar')
-  getSimilarProfiles(@Param('username') username: string) {
-    return this.profileService.getSimilarProfiles(username);
+  async getSimilarProfiles(
+    @Param('username') username: string,
+    @Query() query: GetSimilarProfilesQueryDto,
+  ): Promise<GetSimilarProfilesResponseDto> {
+    return await this.similarProfilesService.getSimilarProfiles(
+      username,
+      query.limit,
+    );
   }
 
   /**
