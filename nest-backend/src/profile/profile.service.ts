@@ -68,18 +68,6 @@ export class ProfileService {
   }
 
   /**
-   * Retrieves secondary (discovered) profiles associated with a primary profile
-   */
-  getSecondaryProfiles(username: string) {
-    return {
-      message: `Getting secondary profiles for ${username}`,
-      username,
-      secondaryProfiles: [],
-      // TODO: Implement secondary profiles retrieval
-    };
-  }
-
-  /**
    * Submits a request to scrape and analyze a new profile
    */
   requestProfileProcessing(username: string) {

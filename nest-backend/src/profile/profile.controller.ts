@@ -7,6 +7,7 @@ import {
 } from './dto/profile-reels.dto';
 import { GetProfileResponseDto } from './dto/profile-response.dto';
 import { ProfileStatusResponseDto } from './dto/profile-status-response.dto';
+import { GetSecondaryProfileResponseDto } from './dto/secondary-profile.dto';
 import {
   GetSimilarProfilesFastQueryDto,
   GetSimilarProfilesFastResponseDto,
@@ -20,6 +21,7 @@ import { CompetitorService } from './services/competitor.service';
 import { ProfileReelsService } from './services/profile-reels.service';
 import { ProfileRetrievalService } from './services/profile-retrieval.service';
 import { ProfileStatusService } from './services/profile-status.service';
+import { SecondaryProfileService } from './services/secondary-profile.service';
 import { SimilarProfilesCacheService } from './services/similar-profiles-cache.service';
 import { SimilarProfilesFastService } from './services/similar-profiles-fast.service';
 import { SimilarProfilesService } from './services/similar-profiles.service';
@@ -35,6 +37,7 @@ export class ProfileController {
     private readonly similarProfilesFastService: SimilarProfilesFastService,
     private readonly profileStatusService: ProfileStatusService,
     private readonly cacheService: SimilarProfilesCacheService,
+    private readonly secondaryProfileService: SecondaryProfileService,
   ) {}
 
   /**
@@ -129,17 +132,23 @@ export class ProfileController {
   async clearSimilarProfilesCache(
     @Param('username') username: string,
   ): Promise<CacheClearingResponseDto> {
-    return this.cacheService.clearCacheForProfile(username);
+    return await this.cacheService.clearCacheForProfile(username);
   }
 
   /**
    * GET /api/profile/{username}/secondary
-   * Description: Retrieves secondary (discovered) profiles associated with a primary profile.
-   * Usage: Can be used to show how the network of profiles is expanding.
+   * Retrieves Secondary (Discovered) Profile Data for Loading States and Previews
+   *
+   * Description: Fetches data for a secondary profile, which is a profile that has been discovered
+   * through the analysis of a primary profile. Primarily intended for displaying loading states
+   * or profile previews before full data is fetched.
+   * Usage: Loading states, profile previews, quick profile cards, profile discovery, competitor research.
    */
   @Get('/:username/secondary')
-  getSecondaryProfiles(@Param('username') username: string) {
-    return this.profileService.getSecondaryProfiles(username);
+  async getSecondaryProfile(
+    @Param('username') username: string,
+  ): Promise<GetSecondaryProfileResponseDto> {
+    return await this.secondaryProfileService.getSecondaryProfile(username);
   }
 
   /**
@@ -155,7 +164,7 @@ export class ProfileController {
   async checkProfileStatus(
     @Param('username') username: string,
   ): Promise<ProfileStatusResponseDto> {
-    return this.profileStatusService.checkProfileStatus(username);
+    return await this.profileStatusService.checkProfileStatus(username);
   }
 
   /**

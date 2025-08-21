@@ -113,6 +113,10 @@ export class SecondaryProfile {
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: PrimaryProfile.name })
   discovered_by_id: PrimaryProfile;
+
+  // Mongoose timestamps (automatically managed)
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const SecondaryProfileSchema =
