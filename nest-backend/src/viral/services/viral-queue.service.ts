@@ -16,20 +16,6 @@ export class ViralQueueService {
   ) {}
 
   /**
-   * Creates a new viral ideas analysis job and adds it to the queue
-   */
-  createViralIdeasQueue(queueData: any) {
-    return {
-      message: 'Creating viral ideas analysis job',
-      sessionId: `session_${Date.now()}`,
-      queueId: `queue_${Date.now()}`,
-      status: 'queued',
-      data: queueData,
-      // TODO: Implement actual queue creation logic
-    };
-  }
-
-  /**
    * Retrieves the status of a specific viral ideas analysis job from the queue
    */
   getViralIdeasQueueStatus(sessionId: string) {

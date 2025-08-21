@@ -1,7 +1,12 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ViralDiscoveryResponseDto } from './dto/viral-discovery-response.dto';
+import {
+  CreateViralIdeasQueueDto,
+  CreateViralIdeasQueueResponseDto,
+} from './dto/viral-ideas-queue.dto';
 import { ViralAnalysisService } from './services/viral-analysis.service';
 import { ViralDiscoveryService } from './services/viral-discovery.service';
+import { ViralIdeasQueueCreationService } from './services/viral-ideas-queue-creation.service';
 import { ViralQueueService } from './services/viral-queue.service';
 
 @Controller('/viral')
@@ -10,16 +15,25 @@ export class ViralController {
     private readonly discoveryService: ViralDiscoveryService,
     private readonly queueService: ViralQueueService,
     private readonly analysisService: ViralAnalysisService,
+    private readonly queueCreationService: ViralIdeasQueueCreationService,
   ) {}
 
   /**
    * POST /api/viral-ideas/queue ⚡ NEW
-   * Description: Creates a new viral ideas analysis job and adds it to the queue.
-   * Usage: Kicks off the AI pipeline to find viral trends.
+   * Creates a new viral ideas analysis job and adds it to the queue
+   *
+   * This endpoint validates the request body, creates a queue entry in the viral_ideas_queue
+   * collection, and links any selected competitors to the queue entry. It follows the same
+   * pattern as the Python FastAPI implementation.
+   *
+   * @param queueData - The viral ideas queue creation request data
+   * @returns Promise<CreateViralIdeasQueueResponseDto> - Queue creation response with ID and status
    */
   @Post('/ideas/queue')
-  createViralIdeasQueue(@Body() queueData: any) {
-    return this.queueService.createViralIdeasQueue(queueData);
+  async createViralIdeasQueue(
+    @Body() queueData: CreateViralIdeasQueueDto,
+  ): Promise<CreateViralIdeasQueueResponseDto> {
+    return await this.queueCreationService.createViralIdeasQueue(queueData);
   }
 
   /**

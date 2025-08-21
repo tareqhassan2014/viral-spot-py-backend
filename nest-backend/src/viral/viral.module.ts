@@ -22,6 +22,7 @@ import {
 } from './entities/viral-scripts.schema';
 import { ViralAnalysisService } from './services/viral-analysis.service';
 import { ViralDiscoveryService } from './services/viral-discovery.service';
+import { ViralIdeasQueueCreationService } from './services/viral-ideas-queue-creation.service';
 import { ViralQueueService } from './services/viral-queue.service';
 import { ViralController } from './viral.controller';
 
@@ -36,7 +37,17 @@ import { ViralController } from './viral.controller';
     ]),
   ],
   controllers: [ViralController],
-  providers: [ViralDiscoveryService, ViralQueueService, ViralAnalysisService],
-  exports: [ViralDiscoveryService, ViralQueueService, ViralAnalysisService],
+  providers: [
+    ViralDiscoveryService,
+    ViralQueueService,
+    ViralAnalysisService,
+    ViralIdeasQueueCreationService,
+  ],
+  exports: [
+    ViralDiscoveryService,
+    ViralQueueService,
+    ViralAnalysisService,
+    ViralIdeasQueueCreationService,
+  ],
 })
 export class ViralModule {}
