@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 
-@Controller('api/profile')
+@Controller('/profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
@@ -10,7 +10,7 @@ export class ProfileController {
    * Description: Retrieves detailed data for a specific profile.
    * Usage: Used to display profile pages on the frontend.
    */
-  @Get(':username')
+  @Get('/:username')
   getProfile(@Param('username') username: string) {
     return this.profileService.getProfile(username);
   }
@@ -20,7 +20,7 @@ export class ProfileController {
    * Description: Fetches all the reels associated with a specific profile.
    * Usage: Populates the reels section of a profile's page.
    */
-  @Get(':username/reels')
+  @Get('/:username/reels')
   getProfileReels(@Param('username') username: string) {
     return this.profileService.getProfileReels(username);
   }
@@ -30,7 +30,7 @@ export class ProfileController {
    * Description: Gets a list of similar profiles. This is the standard endpoint for similarity checks.
    * Usage: Suggests other profiles to the user.
    */
-  @Get(':username/similar')
+  @Get('/:username/similar')
   getSimilarProfiles(@Param('username') username: string) {
     return this.profileService.getSimilarProfiles(username);
   }
@@ -40,7 +40,7 @@ export class ProfileController {
    * Description: A new, faster endpoint for retrieving similar profiles with 24hr caching.
    * Usage: An optimized alternative to the standard /similar endpoint with CDN-delivered images.
    */
-  @Get(':username/similar-fast')
+  @Get('/:username/similar-fast')
   getSimilarProfilesFast(@Param('username') username: string) {
     return this.profileService.getSimilarProfilesFast(username);
   }
@@ -50,7 +50,7 @@ export class ProfileController {
    * Description: Clears cached similar profiles data for a specific username with advanced cache management.
    * Usage: Cache management, data refresh, and performance optimization for similar profiles system.
    */
-  @Delete(':username/similar-cache')
+  @Delete('/:username/similar-cache')
   clearSimilarProfilesCache(@Param('username') username: string) {
     return this.profileService.clearSimilarProfilesCache(username);
   }
@@ -60,7 +60,7 @@ export class ProfileController {
    * Description: Retrieves secondary (discovered) profiles associated with a primary profile.
    * Usage: Can be used to show how the network of profiles is expanding.
    */
-  @Get(':username/secondary')
+  @Get('/:username/secondary')
   getSecondaryProfiles(@Param('username') username: string) {
     return this.profileService.getSecondaryProfiles(username);
   }
@@ -70,7 +70,7 @@ export class ProfileController {
    * Description: Checks the processing status of a profile.
    * Usage: Allows the frontend to poll for updates after requesting a profile to be processed.
    */
-  @Get(':username/status')
+  @Get('/:username/status')
   getProfileStatus(@Param('username') username: string) {
     return this.profileService.getProfileStatus(username);
   }
@@ -80,7 +80,7 @@ export class ProfileController {
    * Description: Submits a request to scrape and analyze a new profile.
    * Usage: The primary way for users to add new profiles to the system.
    */
-  @Post(':username/request')
+  @Post('/:username/request')
   requestProfileProcessing(@Param('username') username: string) {
     return this.profileService.requestProfileProcessing(username);
   }
@@ -90,7 +90,7 @@ export class ProfileController {
    * Description: Adds a target_username as a competitor to a primary_username.
    * Usage: Part of a new competitor analysis feature.
    */
-  @Post(':primary_username/add-competitor/:target_username')
+  @Post('/:primary_username/add-competitor/:target_username')
   addCompetitor(
     @Param('primary_username') primaryUsername: string,
     @Param('target_username') targetUsername: string,

@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ContentService } from './content.service';
 
-@Controller('api/content')
+@Controller('/content')
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
@@ -10,7 +10,7 @@ export class ContentController {
    * Description: Retrieves a list of reels, with support for filtering and pagination.
    * Usage: The main endpoint for browsing and discovering viral content.
    */
-  @Get('reels')
+  @Get('/reels')
   getReels(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
@@ -30,7 +30,7 @@ export class ContentController {
    * Description: Retrieves a list of posts, likely with filtering and pagination.
    * Usage: For browsing content that is not in video format.
    */
-  @Get('posts')
+  @Get('/posts')
   getPosts(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
@@ -50,7 +50,7 @@ export class ContentController {
    * Description: Fetches content from a competitor's profile.
    * Usage: Used in the competitor analysis feature to compare content strategies.
    */
-  @Get('competitor/:username')
+  @Get('/competitor/:username')
   getCompetitorContent(@Param('username') username: string) {
     return this.contentService.getCompetitorContent(username);
   }
@@ -60,7 +60,7 @@ export class ContentController {
    * Description: Fetches content from a user's own profile.
    * Usage: Allows users to analyze their own content through the ViralSpot pipeline.
    */
-  @Get('user/:username')
+  @Get('/user/:username')
   getUserContent(@Param('username') username: string) {
     return this.contentService.getUserContent(username);
   }

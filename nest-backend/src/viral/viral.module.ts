@@ -20,8 +20,10 @@ import {
   ViralScripts,
   ViralScriptsSchema,
 } from './entities/viral-scripts.schema';
+import { ViralAnalysisService } from './services/viral-analysis.service';
+import { ViralDiscoveryService } from './services/viral-discovery.service';
+import { ViralQueueService } from './services/viral-queue.service';
 import { ViralController } from './viral.controller';
-import { ViralService } from './viral.service';
 
 @Module({
   imports: [
@@ -34,7 +36,7 @@ import { ViralService } from './viral.service';
     ]),
   ],
   controllers: [ViralController],
-  providers: [ViralService],
-  exports: [ViralService],
+  providers: [ViralDiscoveryService, ViralQueueService, ViralAnalysisService],
+  exports: [ViralDiscoveryService, ViralQueueService, ViralAnalysisService],
 })
 export class ViralModule {}
