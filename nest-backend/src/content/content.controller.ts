@@ -1,25 +1,26 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ContentService } from './content.service';
 import {
   GetCompetitorContentQueryDto,
   GetCompetitorContentResponseDto,
 } from './dto/get-competitor-content.dto';
+import { GetPostsQueryDto, GetPostsResponseDto } from './dto/get-posts.dto';
 import { GetReelsQueryDto, GetReelsResponseDto } from './dto/get-reels.dto';
 import {
   GetUserContentQueryDto,
   GetUserContentResponseDto,
 } from './dto/get-user-content.dto';
 import { CompetitorContentService } from './services/competitor-content.service';
+import { PostsService } from './services/posts.service';
 import { ReelsService } from './services/reels.service';
 import { UserContentService } from './services/user-content.service';
 
 @Controller('/content')
 export class ContentController {
   constructor(
-    private readonly contentService: ContentService,
     private readonly userContentService: UserContentService,
     private readonly competitorContentService: CompetitorContentService,
     private readonly reelsService: ReelsService,
+    private readonly postsService: PostsService,
   ) {}
 
   /**
@@ -39,23 +40,19 @@ export class ContentController {
   }
 
   /**
-   * GET /api/content/posts
-   * Description: Retrieves a list of posts, likely with filtering and pagination.
-   * Usage: For browsing content that is not in video format.
+   * GET /api/content/posts ⚡
+   * Posts Discovery with Advanced Filtering and Pagination
+   *
+   * Description: This endpoint is used for browsing content that is not in video format, such as single images or carousels.
+   * It functions very similarly to the /api/reels endpoint and reuses the same underlying logic.
+   * The main difference is that it is hardcoded to only return content of the 'post' type.
+   * Usage: Image content discovery, carousel browsing, photo-based content analysis.
    */
   @Get('/posts')
-  getPosts(
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-    @Query('filter') filter?: string,
-    @Query('sort') sort?: string,
-  ) {
-    return this.contentService.getPosts({
-      page: page || 1,
-      limit: limit || 20,
-      filter,
-      sort,
-    });
+  async getPosts(
+    @Query() query: GetPostsQueryDto,
+  ): Promise<GetPostsResponseDto> {
+    return await this.postsService.getPosts(query);
   }
 
   /**
