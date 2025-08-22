@@ -4,11 +4,13 @@ import {
   GetCompetitorContentQueryDto,
   GetCompetitorContentResponseDto,
 } from './dto/get-competitor-content.dto';
+import { GetReelsQueryDto, GetReelsResponseDto } from './dto/get-reels.dto';
 import {
   GetUserContentQueryDto,
   GetUserContentResponseDto,
 } from './dto/get-user-content.dto';
 import { CompetitorContentService } from './services/competitor-content.service';
+import { ReelsService } from './services/reels.service';
 import { UserContentService } from './services/user-content.service';
 
 @Controller('/content')
@@ -17,26 +19,23 @@ export class ContentController {
     private readonly contentService: ContentService,
     private readonly userContentService: UserContentService,
     private readonly competitorContentService: CompetitorContentService,
+    private readonly reelsService: ReelsService,
   ) {}
 
   /**
-   * GET /api/content/reels
-   * Description: Retrieves a list of reels, with support for filtering and pagination.
-   * Usage: The main endpoint for browsing and discovering viral content.
+   * GET /api/content/reels ⚡
+   * Comprehensive Reels Discovery with Advanced Filtering, Sorting, and Pagination
+   *
+   * Description: This is the main endpoint for browsing and discovering viral content in the ViralSpot platform.
+   * It provides a powerful set of filters to allow users to narrow down the content they are interested in.
+   * The results are paginated to ensure efficient loading and browsing.
+   * Usage: Content discovery, viral content browsing, filtered content search, and trending content analysis.
    */
   @Get('/reels')
-  getReels(
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-    @Query('filter') filter?: string,
-    @Query('sort') sort?: string,
-  ) {
-    return this.contentService.getReels({
-      page: page || 1,
-      limit: limit || 20,
-      filter,
-      sort,
-    });
+  async getReels(
+    @Query() query: GetReelsQueryDto,
+  ): Promise<GetReelsResponseDto> {
+    return await this.reelsService.getReels(query);
   }
 
   /**

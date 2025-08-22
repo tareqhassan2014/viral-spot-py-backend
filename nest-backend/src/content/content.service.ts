@@ -16,31 +16,6 @@ export class ContentService {
     @InjectModel(Content.name)
     private contentModel: Model<ContentDocument>,
   ) {}
-  /**
-   * Retrieves a list of reels with support for filtering and pagination
-   */
-  getReels(options: PaginationOptions) {
-    const { page, limit, filter, sort } = options;
-
-    return {
-      message: 'Getting reels with filtering and pagination',
-      data: {
-        reels: [],
-        pagination: {
-          currentPage: page,
-          totalPages: 0,
-          totalItems: 0,
-          itemsPerPage: limit,
-        },
-        filters: {
-          applied: filter || null,
-          available: ['viral', 'trending', 'recent', 'popular'],
-        },
-        sort: sort || 'recent',
-      },
-      // TODO: Implement actual reels retrieval with MongoDB queries
-    };
-  }
 
   /**
    * Retrieves a list of posts with filtering and pagination
