@@ -94,6 +94,9 @@ export class ViralScripts {
     index: true,
   })
   status: string;
+
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const ViralScriptsSchema = SchemaFactory.createForClass(ViralScripts);

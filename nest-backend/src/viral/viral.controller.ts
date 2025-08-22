@@ -1,9 +1,11 @@
 import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { ProcessPendingViralIdeasResponseDto } from './dto/process-pending-viral-ideas.dto';
+import { QueueStatusResponseDto } from './dto/queue-status.dto';
 import {
   AlreadyProcessingResponseDto,
   StartViralAnalysisResponseDto,
 } from './dto/start-viral-analysis.dto';
+import { ViralAnalysisResultsResponseDto } from './dto/viral-analysis-results.dto';
 import { ViralDiscoveryResponseDto } from './dto/viral-discovery-response.dto';
 import { GetViralIdeasQueueStatusResponseDto } from './dto/viral-ideas-queue-status.dto';
 import {
@@ -11,7 +13,9 @@ import {
   CreateViralIdeasQueueResponseDto,
 } from './dto/viral-ideas-queue.dto';
 import { ProcessPendingViralIdeasService } from './services/process-pending-viral-ideas.service';
+import { QueueStatusService } from './services/queue-status.service';
 import { StartViralAnalysisService } from './services/start-viral-analysis.service';
+import { ViralAnalysisResultsService } from './services/viral-analysis-results.service';
 import { ViralAnalysisService } from './services/viral-analysis.service';
 import { ViralDiscoveryService } from './services/viral-discovery.service';
 import { ViralIdeasQueueCreationService } from './services/viral-ideas-queue-creation.service';
@@ -30,6 +34,8 @@ export class ViralController {
     private readonly queueStatusService: ViralIdeasQueueStatusService,
     private readonly processPendingViralIdeasService: ProcessPendingViralIdeasService,
     private readonly startViralAnalysisService: StartViralAnalysisService,
+    private readonly overallQueueStatusService: QueueStatusService,
+    private readonly viralAnalysisResultsService: ViralAnalysisResultsService,
   ) {}
 
   /**
@@ -148,12 +154,29 @@ export class ViralController {
 
   /**
    * GET /api/viral-analysis/{queue_id}/results ⚡ NEW
-   * Description: Retrieves the final results of a viral analysis job.
+   * Retrieves the final results of a viral analysis job with comprehensive analysis data, reels, and insights
+   *
+   * Description: This endpoint retrieves the complete, processed results of a viral ideas analysis job.
+   * It serves as the primary data source for displaying comprehensive analysis results to users,
+   * aggregating data from multiple database tables to provide a unified response.
+   *
+   * Key Features:
+   * - Multi-table data aggregation from 7+ database tables
+   * - Flexible JSONB analysis data supporting multiple workflow versions
+   * - Real-time CDN URL generation for profile images
+   * - Legacy compatibility for backward-compatible frontend integrations
+   * - Enhanced content transformation using working endpoint patterns
+   * - Performance-optimized queries with proper indexing
+   *
    * Usage: Fetches the data to be displayed on the frontend once an analysis is complete.
    */
   @Get('/analysis/:queue_id/results')
-  getViralAnalysisResults(@Param('queue_id') queueId: string) {
-    return this.analysisService.getViralAnalysisResults(queueId);
+  async getViralAnalysisResults(
+    @Param('queue_id') queueId: string,
+  ): Promise<ViralAnalysisResultsResponseDto> {
+    return await this.viralAnalysisResultsService.getViralAnalysisResults(
+      queueId,
+    );
   }
 
   /**
@@ -164,5 +187,28 @@ export class ViralController {
   @Get('/analysis/:queue_id/content')
   getViralAnalysisContent(@Param('queue_id') queueId: string) {
     return this.analysisService.getViralAnalysisContent(queueId);
+  }
+
+  /**
+   * GET /api/viral-ideas/queue-status ⚡ NEW
+   * Gets comprehensive statistics and monitoring data for the viral ideas processing queue
+   *
+   * Description: This endpoint serves as the primary system monitoring and dashboard endpoint
+   * for the viral ideas analysis pipeline. It provides real-time insights into queue health,
+   * processing performance, and recent activity patterns.
+   *
+   * Key Features:
+   * - Real-time queue statistics across all status categories
+   * - Recent activity monitoring with the latest 10 submissions
+   * - Performance metrics including progress tracking and timing
+   * - Content strategy insights from form data aggregation
+   * - System health indicators for operational monitoring
+   *
+   * Usage: Administrative dashboards, user status displays, performance analytics,
+   * capacity planning, and error detection.
+   */
+  @Get('/ideas/queue-status')
+  async getQueueStatus(): Promise<QueueStatusResponseDto> {
+    return await this.overallQueueStatusService.getQueueStatus();
   }
 }
