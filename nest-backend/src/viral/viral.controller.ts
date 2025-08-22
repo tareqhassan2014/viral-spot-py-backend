@@ -1,4 +1,8 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import {
+  AlreadyProcessingResponseDto,
+  StartViralAnalysisResponseDto,
+} from './dto/start-viral-analysis.dto';
 import { ViralDiscoveryResponseDto } from './dto/viral-discovery-response.dto';
 import { GetViralIdeasQueueStatusResponseDto } from './dto/viral-ideas-queue-status.dto';
 import {
@@ -13,6 +17,8 @@ import { ViralQueueService } from './services/viral-queue.service';
 
 @Controller('/viral')
 export class ViralController {
+  private readonly logger = new Logger(ViralController.name);
+
   constructor(
     private readonly discoveryService: ViralDiscoveryService,
     private readonly queueService: ViralQueueService,
@@ -70,13 +76,26 @@ export class ViralController {
   }
 
   /**
-   * POST /api/viral-ideas/queue/{queue_id}/start ⚡ NEW
-   * Description: Signals a queued analysis job as ready for background worker processing.
-   * Usage: Queue signaling and worker coordination for viral analysis jobs.
+   * POST /api/viral-ideas/queue/{queue_id}/start ⚡
+   * Viral Analysis Queue Signal with Intelligent Worker Process Coordination
+   *
+   * Description: The Start Viral Analysis endpoint provides comprehensive queue signaling and worker coordination
+   * for viral content analysis workflows. This endpoint serves as a critical trigger mechanism that signals the
+   * background processing system that a specific viral ideas analysis job is ready for processing.
+   *
+   * Key Features:
+   * - Queue Signal Management: Intelligent signaling system for background worker process coordination
+   * - Job State Verification: Comprehensive queue entry validation and status verification before processing
+   * - Worker Process Integration: Seamless coordination with background ViralIdeasProcessor workers
+   * - Status Tracking: Real-time status monitoring and progress tracking throughout the analysis lifecycle
+   *
+   * Usage: Manual analysis triggers, priority processing, queue management, development testing, administrative control.
    */
   @Post('/ideas/queue/:queue_id/start')
-  startViralAnalysisProcessing(@Param('queue_id') queueId: string) {
-    return this.queueService.startViralAnalysisProcessing(queueId);
+  async startViralAnalysisProcessing(
+    @Param('queue_id') queueId: string,
+  ): Promise<StartViralAnalysisResponseDto | AlreadyProcessingResponseDto> {
+    return await this.queueService.startViralAnalysisProcessing(queueId);
   }
 
   /**
