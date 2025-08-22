@@ -3,6 +3,7 @@ import {
   GetCompetitorContentQueryDto,
   GetCompetitorContentResponseDto,
 } from './dto/get-competitor-content.dto';
+import { GetFilterOptionsResponseDto } from './dto/get-filter-options.dto';
 import { GetPostsQueryDto, GetPostsResponseDto } from './dto/get-posts.dto';
 import { GetReelsQueryDto, GetReelsResponseDto } from './dto/get-reels.dto';
 import {
@@ -10,6 +11,7 @@ import {
   GetUserContentResponseDto,
 } from './dto/get-user-content.dto';
 import { CompetitorContentService } from './services/competitor-content.service';
+import { FilterOptionsService } from './services/filter-options.service';
 import { PostsService } from './services/posts.service';
 import { ReelsService } from './services/reels.service';
 import { UserContentService } from './services/user-content.service';
@@ -21,6 +23,7 @@ export class ContentController {
     private readonly competitorContentService: CompetitorContentService,
     private readonly reelsService: ReelsService,
     private readonly postsService: PostsService,
+    private readonly filterOptionsService: FilterOptionsService,
   ) {}
 
   /**
@@ -53,6 +56,20 @@ export class ContentController {
     @Query() query: GetPostsQueryDto,
   ): Promise<GetPostsResponseDto> {
     return await this.postsService.getPosts(query);
+  }
+
+  /**
+   * GET /api/content/filter ⚡
+   * Dynamic Filter Options Retrieval
+   *
+   * Description: This is a utility endpoint designed to populate the filter dropdowns and selection menus on the frontend.
+   * It dynamically queries the database to find all unique values for the various filterable fields,
+   * such as categories, content types, languages, and keywords.
+   * Usage: Frontend filter population, dynamic UI generation, database-synced filter options.
+   */
+  @Get('/filter')
+  async getFilterOptions(): Promise<GetFilterOptionsResponseDto> {
+    return await this.filterOptionsService.getFilterOptions();
   }
 
   /**

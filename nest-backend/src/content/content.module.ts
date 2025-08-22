@@ -7,6 +7,7 @@ import {
 import { ContentController } from './content.controller';
 import { Content, ContentSchema } from './schemas/content.schema';
 import { CompetitorContentService } from './services/competitor-content.service';
+import { FilterOptionsService } from './services/filter-options.service';
 import { PostsService } from './services/posts.service';
 import { ReelsService } from './services/reels.service';
 import { UserContentService } from './services/user-content.service';
@@ -24,12 +25,14 @@ import { UserContentService } from './services/user-content.service';
     CompetitorContentService,
     ReelsService,
     PostsService,
+    FilterOptionsService,
   ],
   exports: [
     UserContentService,
     CompetitorContentService,
     ReelsService,
     PostsService,
+    FilterOptionsService,
   ],
 })
 export class ContentModule {}
