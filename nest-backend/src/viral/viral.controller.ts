@@ -1,10 +1,22 @@
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ProcessPendingViralIdeasResponseDto } from './dto/process-pending-viral-ideas.dto';
 import { QueueStatusResponseDto } from './dto/queue-status.dto';
 import {
   AlreadyProcessingResponseDto,
   StartViralAnalysisResponseDto,
 } from './dto/start-viral-analysis.dto';
+import {
+  GetViralAnalysisContentQueryDto,
+  ViralAnalysisContentResponseDto,
+} from './dto/viral-analysis-content.dto';
 import { ViralAnalysisResultsResponseDto } from './dto/viral-analysis-results.dto';
 import { ViralDiscoveryResponseDto } from './dto/viral-discovery-response.dto';
 import { GetViralIdeasQueueStatusResponseDto } from './dto/viral-ideas-queue-status.dto';
@@ -15,6 +27,7 @@ import {
 import { ProcessPendingViralIdeasService } from './services/process-pending-viral-ideas.service';
 import { QueueStatusService } from './services/queue-status.service';
 import { StartViralAnalysisService } from './services/start-viral-analysis.service';
+import { ViralAnalysisContentService } from './services/viral-analysis-content.service';
 import { ViralAnalysisResultsService } from './services/viral-analysis-results.service';
 import { ViralAnalysisService } from './services/viral-analysis.service';
 import { ViralDiscoveryService } from './services/viral-discovery.service';
@@ -36,6 +49,7 @@ export class ViralController {
     private readonly startViralAnalysisService: StartViralAnalysisService,
     private readonly overallQueueStatusService: QueueStatusService,
     private readonly viralAnalysisResultsService: ViralAnalysisResultsService,
+    private readonly viralAnalysisContentService: ViralAnalysisContentService,
   ) {}
 
   /**
@@ -181,12 +195,31 @@ export class ViralController {
 
   /**
    * GET /api/viral-analysis/{queue_id}/content ⚡ NEW
-   * Description: Retrieves the content that was analyzed as part of a job.
+   * Retrieves the content that was analyzed as part of a job
+   *
+   * Description: This endpoint is designed to be used in conjunction with the analysis results.
+   * It fetches the source content (reels and posts) that was used in a specific analysis job.
+   * This is essential for the frontend to display the original content alongside AI-generated insights.
+   *
+   * Key Features:
+   * - Dynamic content filtering (all, primary, competitor)
+   * - Comprehensive field selection with engagement metrics
+   * - Smart sorting strategies based on content type
+   * - Active competitor filtering for accurate analysis scope
+   * - Multiple analysis support with latest analysis selection
+   * - Content type classification for frontend display
+   *
    * Usage: To show the source content alongside the analysis results.
    */
   @Get('/analysis/:queue_id/content')
-  getViralAnalysisContent(@Param('queue_id') queueId: string) {
-    return this.analysisService.getViralAnalysisContent(queueId);
+  async getViralAnalysisContent(
+    @Param('queue_id') queueId: string,
+    @Query() query: GetViralAnalysisContentQueryDto,
+  ): Promise<ViralAnalysisContentResponseDto> {
+    return await this.viralAnalysisContentService.getViralAnalysisContent(
+      queueId,
+      query,
+    );
   }
 
   /**

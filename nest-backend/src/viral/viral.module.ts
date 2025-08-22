@@ -32,6 +32,7 @@ import {
 import { ProcessPendingViralIdeasService } from './services/process-pending-viral-ideas.service';
 import { QueueStatusService } from './services/queue-status.service';
 import { StartViralAnalysisService } from './services/start-viral-analysis.service';
+import { ViralAnalysisContentService } from './services/viral-analysis-content.service';
 import { ViralAnalysisResultsService } from './services/viral-analysis-results.service';
 import { ViralAnalysisService } from './services/viral-analysis.service';
 import { ViralDiscoveryService } from './services/viral-discovery.service';
@@ -64,6 +65,7 @@ import { ViralController } from './viral.controller';
     StartViralAnalysisService,
     QueueStatusService,
     ViralAnalysisResultsService,
+    ViralAnalysisContentService,
   ],
   exports: [
     ViralQueueService,
@@ -75,6 +77,7 @@ import { ViralController } from './viral.controller';
     StartViralAnalysisService,
     QueueStatusService,
     ViralAnalysisResultsService,
+    ViralAnalysisContentService,
   ],
 })
 export class ViralModule {}
