@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import { ProcessPendingViralIdeasResponseDto } from './dto/process-pending-viral-ideas.dto';
 import {
   AlreadyProcessingResponseDto,
   StartViralAnalysisResponseDto,
@@ -9,6 +10,8 @@ import {
   CreateViralIdeasQueueDto,
   CreateViralIdeasQueueResponseDto,
 } from './dto/viral-ideas-queue.dto';
+import { ProcessPendingViralIdeasService } from './services/process-pending-viral-ideas.service';
+import { StartViralAnalysisService } from './services/start-viral-analysis.service';
 import { ViralAnalysisService } from './services/viral-analysis.service';
 import { ViralDiscoveryService } from './services/viral-discovery.service';
 import { ViralIdeasQueueCreationService } from './services/viral-ideas-queue-creation.service';
@@ -25,6 +28,8 @@ export class ViralController {
     private readonly analysisService: ViralAnalysisService,
     private readonly queueCreationService: ViralIdeasQueueCreationService,
     private readonly queueStatusService: ViralIdeasQueueStatusService,
+    private readonly processPendingViralIdeasService: ProcessPendingViralIdeasService,
+    private readonly startViralAnalysisService: StartViralAnalysisService,
   ) {}
 
   /**
@@ -95,7 +100,9 @@ export class ViralController {
   async startViralAnalysisProcessing(
     @Param('queue_id') queueId: string,
   ): Promise<StartViralAnalysisResponseDto | AlreadyProcessingResponseDto> {
-    return await this.queueService.startViralAnalysisProcessing(queueId);
+    return await this.startViralAnalysisService.startViralAnalysisProcessing(
+      queueId,
+    );
   }
 
   /**
@@ -109,13 +116,24 @@ export class ViralController {
   }
 
   /**
-   * POST /api/viral-ideas/process-pending ⚡ NEW
-   * Description: Processes all pending items in the viral ideas queue.
-   * Usage: A batch operation to clear the queue and process multiple jobs.
+   * POST /api/viral-ideas/process-pending ⚡
+   * Batch Processing Engine for Pending Viral Ideas Queue Management
+   *
+   * Description: This endpoint provides comprehensive batch processing capabilities for pending viral ideas
+   * analysis jobs in the queue. It identifies all pending queue entries, signals them for processing,
+   * and coordinates with background workers to ensure efficient queue management and processing.
+   *
+   * Key Features:
+   * - Batch Queue Processing: Processes all pending, failed, and paused queue entries in a single operation
+   * - Intelligent Entry Validation: Validates each queue entry before processing to ensure data integrity
+   * - Worker Coordination: Signals background workers to pick up processed entries for analysis
+   * - Comprehensive Statistics: Provides detailed processing statistics and results tracking
+   *
+   * Usage: Administrative queue management, batch processing operations, queue health maintenance, system cleanup.
    */
   @Post('/ideas/process-pending')
-  processPendingViralIdeas() {
-    return this.queueService.processPendingViralIdeas();
+  async processPendingViralIdeas(): Promise<ProcessPendingViralIdeasResponseDto> {
+    return await this.processPendingViralIdeasService.processPendingViralIdeas();
   }
 
   /**

@@ -20,6 +20,8 @@ import {
   ViralScripts,
   ViralScriptsSchema,
 } from './entities/viral-scripts.schema';
+import { ProcessPendingViralIdeasService } from './services/process-pending-viral-ideas.service';
+import { StartViralAnalysisService } from './services/start-viral-analysis.service';
 import { ViralAnalysisService } from './services/viral-analysis.service';
 import { ViralDiscoveryService } from './services/viral-discovery.service';
 import { ViralIdeasQueueCreationService } from './services/viral-ideas-queue-creation.service';
@@ -44,6 +46,8 @@ import { ViralController } from './viral.controller';
     ViralDiscoveryService,
     ViralIdeasQueueStatusService,
     ViralIdeasQueueCreationService,
+    ProcessPendingViralIdeasService,
+    StartViralAnalysisService,
   ],
   exports: [
     ViralQueueService,
@@ -51,6 +55,8 @@ import { ViralController } from './viral.controller';
     ViralDiscoveryService,
     ViralIdeasQueueStatusService,
     ViralIdeasQueueCreationService,
+    ProcessPendingViralIdeasService,
+    StartViralAnalysisService,
   ],
 })
 export class ViralModule {}
